@@ -1,0 +1,87 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fnil\fcharset77 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green0\blue0;\red0\green0\blue191;
+\red96\green96\blue96;\red0\green115\blue0;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs18 \cf2 (\
+\cf3 // now we have a filter\cf2 \
+a = \cf4 MelFilter\cf2 .new.importMelFilter ;\
+a.createPitchList ;\
+a.createPitchDict ;\
+a.createPitchFilter(21, 100) ;\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 a.pitchFilter ;\
+a.pitchKeys ;\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2  a.pitchFilter.flop.size\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 )\
+\
+\
+(\
+s = \cf4 Server\cf2 .local ;\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 SynthDef\cf2 (\cf5 "player88"\cf2 , \{ \cf4 arg\cf2  out = 0, freq = 100, dur = 0.01, size = 58 ;\
+		\cf4 var\cf2  env, sinus ;\
+		\cf4 var\cf2  levels = \cf4 Control\cf2 .names([\cf6 \\levels\cf2 ]).ir(\cf4 Array\cf2 .fill(1000, \{0.001\}));\
+		env = \cf4 Env\cf2 .new(levels, \cf4 Array\cf2 .fill(levels.size-1, \{ dur \})) ;\
+		sinus = \cf4 SinOsc\cf2 .ar(freq) \
+			* \cf4 EnvGen\cf2 .kr(env, doneAction:2);\
+		\cf4 Out\cf2 .ar(out, sinus ) ;\
+	\}).send(s) ;\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 \
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 (\
+\cf4 var\cf2  pitchFilter2 = a.pitchFilter.flop ;\
+pitchFilter2.postln;\
+pitchFilter2.do(\{ \cf4 arg\cf2  item, index ;\
+	\cf3 //item.postln;\cf2 \
+	([\cf5 "/n_setn"\cf2 , 2000+index, \cf5 "levels"\cf2 ]++item).postln ;\
+	\cf3 //a.pitchKeys[index].midicps.postln;\cf2 \
+	s.sendBundle(\cf4 nil\cf2 ,\
+		[\cf5 "/s_new"\cf2 , \cf5 "player88"\cf2 , 2000+index, 1, 0, \cf6 \\freq\cf2 , a.pitchKeys[index].midicps], \cf3 // start note\cf2 \
+		[\cf5 "/n_setn"\cf2 , 2000+index, \cf5 "levels"\cf2 ]++item ;\
+	);\
+	\})\
+)\
+s.sendMsg(\cf6 \\n_trace\cf2 , 2002)\
+\
+\cf0 a.pitchFilter.flop[60].postln.plot2(range:[0, 0.1])\cf2 \
+\
+(\
+\cf4 var\cf2  pitchFilter2 = a.pitchFilter.flop ;\
+\cf3 // pitchFilter2.do(\{arg item, i; [i, item[0..10]].postln\}) ;\cf2 \
+\
+pitchFilter2.do(\{ \cf4 arg\cf2  item, index ;\
+	\cf4 var\cf2  dur = 0.1 ;\
+	\cf4 var\cf2  env = \cf4 Env\cf2 .new(item, \cf4 Array\cf2 .fill(item.size-1, \{ dur \})) ;\
+	item.postln;\
+	\{\cf4 SinOsc\cf2 .ar(a.pitchKeys[index].midicps) * \cf4 EnvGen\cf2 .kr(env, doneAction:2) \}.play  ;\
+	\}) ;\
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 \
+\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 var\cf2  pitchFilter2 = a.pitchFilter.flop ;\
+pitchFilter2.do(\{ \cf4 arg\cf2  item, index ;\
+			\cf4 Synth\cf2 .tail(\cf4 nil\cf2 , \cf5 "player88"\cf2 ,  [\cf6 \\freq\cf2 , item.midicps, \cf6 \\levels\cf2 , pitchFilter2[index], \cf6 \\dur\cf2 , 0.01 ]) ;\
+			\}) ;	\
+\
+\
+\cf4 SynthDef\cf2 (\cf5 "test"\cf2 , \{\cf4 arg\cf2  out=0, freq = #[1000,200] ;\
+		\cf4 Out\cf2 .ar(out, \cf4 SinOsc\cf2 .ar(freq));\
+\}).send(s) ;\
+\
+\
+\
+\cf4 Synth\cf2 .tail(\cf4 nil\cf2 , \cf5 "test"\cf2 , [\cf6 \\freq\cf2 , 2,100, 200]) }

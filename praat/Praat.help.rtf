@@ -1,0 +1,534 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;\f2\fnil\fcharset77 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue191;\red96\green96\blue96;\red191\green0\blue0;
+\red0\green0\blue0;\red0\green0\blue191;\red191\green0\blue0;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs36 \cf0 Praat			interface to Praat scripting \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\fs24 \cf0 Praat\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b0 \cf0 \
+Praat (http://www.praat.org) is a powerful audio analysis and visualization package: while specialized in phonetics,  its tools are interesting in a more general perspective. Praat can be executed from command line, passing  a praat script.  A Praat script contains (very simple) instructions which exhaustively mimics Praat's GUI commands. \
+The Praat object is intended to provide capabilites to script Praat with a very simple interface. \
+It is actually intended mainly for graphical manipulation.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b \cf0 Praat
+\f1\b0  class provides:\
+i. temporary file generation. Two files are generated: a soundfile to be analysed by Praat and a scritp file. The script file can refer to the audio file. (Piping could be supported, but actually I'm not able to have it working).\
+ii. SC interface to Praat commands\
+iii. Praat execution from inside SC\
+IV. EPS file opening \
+ \
+
+\f0\b Requirements
+\f1\b0 \
+Praat installed as usual in the Applications folder (but you can change the path using low level interface).\
+The Open method uses Preview (but you can change the path in the low level interface). \
+\
+
+\f0\b asPraat
+\f1\b0 \
+ \
+Converts an object in a Praat objects. Receivers are:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 Implementations of 'asPraat' :\
+   ArrayedCollection-asPraat :     this.asPraat(sndFileName, append)\
+   Buffer-asPraat :     this.asPraat(sndFileName, append)\
+   Env-asPraat :     this.asPraat(sndFileName, append, size)\
+   Function-asPraat :     this.asPraat(sndFileName, append)\
+   Signal-asPraat :     this.asPraat(sndFileName, append)\
+   SoundFile-asPraat :     this.asPraat(sndFileName, append)\
+   Wavetable-asPraat :     this.asPraat(sndFileName, append)\
+   
+\f1\fs24  \
+The method returns a Praat object, write a temporary sound file (sndFileName) and select a scripting mode (more later).\
+\
+
+\f2\fs18 (\
+f = \cf2 SoundFile\cf0 .new;\
+f.openRead(\cf3 "sounds/a11wlk01-44_1.aiff"\cf0 );\
+f = f.asPraat ;\
+)\
+\
+\cf2 Env\cf0 .perc.asPraat(size:1000) ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\fs24 \cf0 Note that for Function and Buffer you need to use fillData before asPraat. This surely can be implemented better, in any case it works for the moment. As in plot method, in fillData on a function you can specify duration (i.e. how much signal to collect)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+\
+\
+s.boot ;\
+\
+b = \{\cf2 SinOsc\cf0 .ar\}.fillData\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // wait a bit \cf0 \
+b = b.asPraat ; \
+\
+\cf4 // quit server, see Pipe help file\cf0 \
+s.quit ;				\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\fs24 \cf0 \
+\
+ 
+\f2 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs28 \cf0 Instance Methods
+\f2\b0\fs24 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs28 \cf0 (Hi-level inteface)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b0\fs24 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b \cf0 createPlot
+\f1\b0 \
+Mimics the draw method in Praat (see for parameters), plotting the signal.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf5 a = \cf6 Array\cf5 .series(100, -1.0, 0.02) ;\
+p = a.asPraat ;\
+p.createPlot ;
+\f1\fs24 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+With method chaining:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf2 Env\cf0 .perc.asPraat.createPlot ;
+\f1\fs24 \
+ \
+If you assign it to a variable you can open it:\
+
+\f2\fs18 \cf2 \
+\cf0 e = \cf2 Env\cf0 .perc.asPraat.createPlot ;\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 \
+// wait until Praat as finished --> RESULT = 0\
+// then:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+e.open ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // using args\cf0 \
+e = \cf2 Env\cf0 .perc.asPraat(size:50).createPlot(drawingMethod:"poles", verticalRange:[-1,1]) ;\
+\
+\cf4 // NOTE: if you have already called open, better close Preview, at least on 10.3.9\
+// a piping issue? (see Pipe)\cf0 \
+\
+e.open ;\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs24 \cf0 open
+\f1\b0 \
+Simply calls Preview to see the EPS file (in case you have it). It accepts bot the path of the EPS file and the path of the viewer.\
+\
+
+\f0\b deleteTmp
+\f1\b0 \
+Delete .aiff and .praat temporary files.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf4 // set by e ;
+\f1\fs24 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf2 File\cf0 .exists(e.sndFileName) ;
+\f1\fs24 \
+\
+
+\f2\fs18 e.deleteTmp ;\
+\
+\cf2 File\cf0 .exists(e.sndFileName) ;
+\f1\fs24 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b \cf0 createSpectrogram
+\f1\b0 \
+Mimics the spectrogram (i.e. sonogram) analysis  and the spectrogram painting methods in Praat (see for parameters). Paints a sonogram of the signal.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+(\
+f = \cf2 SoundFile\cf0 .new;\
+f.openRead(\cf3 "sounds/a11wlk01-44_1.aiff"\cf0 );\
+\
+p = f.asPraat ;\
+p.createSpectrogram ;\
+)\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // then\cf0 \
+p.open ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs24 \cf0 createSpectrum
+\f1\b0 \
+Mimics the spectrum analysis  and the spectrum drawing methods in Praat (see for parameters). Draws a spectrum of the signal, with log option.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+(\
+a = \cf2 Signal\cf0 .sineFill(441, 1.0/(\cf2 Array\cf0 .series(20)+1)) ;\
+b = \cf2 Signal\cf0 .new ;\
+100.do(\{\cf2 arg\cf0  i; b = b.addAll(a) \}) ;\
+)\
+\
+b.asPraat.createSpectrum \cf4 // linear freq\cf0 \
+b.asPraat.open\
+\
+b.asPraat.createSpectrum(log:\cf2 true\cf0 ) \cf4 // log freq\cf0 \
+\
+b.asPraat.open\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs24 \cf0 createIntensity\
+createPitch
+\f1\b0 \
+As above, two methods providing interface to analysis/plotting of intensity and pitch. See Praat for parameters.\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf4 // if you have already called open, better close Preview, at least on 10.3.9\cf0 \
+s.boot ;\
+f = \{ \cf2 SinOsc\cf0 .ar(\cf2 XLine\cf0 .kr(100,500,4),0,0.1) \}.fillData(4) ;\
+\cf4 // wait 4 secs \cf0 \
+p = f.asPraat ;\
+\
+s.quit ; \
+\
+p.createPitch(log:\cf2 true\cf0 )\
+p.open ;\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs24 \cf0 createAll\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b0 \cf0 Generates an EPS containing waveform, spectrogram, pitch and intensity. All with defaults, just to take a look.\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+s.boot ;\
+f = \{ \cf2 Klank\cf0 .ar(`[[800, 1071, 1153, 1723], \cf2 nil\cf0 , [1, 1, 1, 1]], \cf2 Impulse\cf0 .ar(2, 0, 0.1)) \}.fillData(2);
+\f1\fs24 \
+
+\f2\fs18 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // wait 2 secs \cf0 \
+p = f.asPraat ;\
+\
+s.quit ; \
+\
+p.createAll\
+p.open ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs24 \cf0 quickView\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b0 \cf0 Generates an EPS containing waveform and spectrogram. All with defaults, just to take a look.\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+(\
+\cf2 var\cf0  sig, rect ;\
+\
+rect = \cf2 Signal\cf0 .rectWindow(882, 441);\
+sig = \cf2 Signal\cf0 .new ;\
+\
+100.do(\{sig = sig.addAll(rect-0.5) \}) ;\
+\
+sig.asPraat.quickView ;\
+)\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // if you work with defaults \cf0 \
+\cf4 // (i.e. without explicitly setting files\cf0 \
+\cf4 // you can do this\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 Praat\cf0 .new.open\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\fs24 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs28 \cf0 (Lo-level interface)\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b0\fs24 \cf0 \
+Hi-level methods are simply stacks of lo-level methods. Lo-level methods are intended as complete Praat commands. Actually they are few, but should be added when needed. Here's the whole stuff:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 \
+Praat.dumpInterface\
+\
+   script (  )\
+   script_ (  )\
+   sndFileName (  )\
+   sndFileName_ (  )\
+   mode (  )\
+   mode_ (  )\
+   array (  )\
+   array_ (  )\
+   spectrogram (  )\
+   spectrogram_ (  )\
+   init ( sndName, append )\
+   writeSound ( sndName )\
+   writeScript (  )\
+   sendPraat ( scriptPath, praatPath )\
+   send (  )\
+   deleteTmp (  )\
+   toSpectrogram ( windowLength, maxFreq, timeStep, freqStep, windowShape )\
+   paintSpectrogram ( timeRange, freqRange, maxDB, autoscaling, dynamicRange, preEmphasis, dynamicCompression, garnish )\
+   writeSpectrogram ( long, fileName )\
+   writeEPS ( epsFileName )\
+   draw ( timeRange, verticalRange, garnish, drawingMethod )\
+   toSpectrum ( fast )\
+   drawSpectrum ( log, frequencyRange, minimumPower, maximumPower, garnish )\
+   writeSpectrum ( long, fileName )\
+   toIntensity ( minimumPitch, timeStep, subtractMean )\
+   drawIntensity ( timeRange, minimum, maximum, garnish )\
+   toPitch ( timeStep, pitchFloor, pitchCeiling )\
+   drawPitch ( log, timeRange, frequencyRange, garnish )\
+   open ( epsFileName, openApp )\
+   selectViewport ( fromX, toX, fromY, toY )\
+   lineWidth ( width )\
+   line ( style )\
+   color ( color )\
+   markEvery ( where, units, distance, writeNumbers, drawTicks, drawDottedLines )\
+   oneMark ( position, writeNumber, drawTick, drawDottedLine, drawText )\
+   createSpectrogram ( epsFileName, windowLength, maxFreq, timeStep, freqStep, windowShape, timeRange, freqRange, maxDB, autoscaling, dynamicRange, preEmphasis, dynamicCompression, garnish, fromX, toX, fromY, toY, open )\
+   exportSpectrogram ( windowLength, maxFreq, timeStep, freqStep, windowShape, long, fileName )\
+   exportSpectrum ( fast, long, fileName )\
+   createPlot ( epsFileName, timeRange, verticalRange, garnish, drawingMethod, fromX, toX, fromY, toY )\
+   createIntensity ( epsFileName, mimimumPitch, timeStep, subtractMean, timeRange, minimum, maximum, garnish, fromX, toX, fromY, toY )\
+   createSpectrum ( fast, log, frequencyRange, minimumPower, maximumPower, garnish )\
+   createPitch ( epsFileName, timeStep, pitchFloor, pitchCeiling, log, timeRange, frequencyRange, garnish, fromX, toX, fromY, toY )\
+   createAll (  )\
+   quickView (  )\
+   importSpectrogram ( spectrogramFileName )\
+   jSpectrogram ( step )\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 ///////////////////////\cf0 \
+\cf4 // double version   //\cf0 \
+\cf4 /////////////////////\cf0 \
+\
+\
+(\
+\cf4 /* Hi-level version */\cf0 \
+\
+f = \cf2 SoundFile\cf0 .new;\
+f.openRead(\cf3 "sounds/a11wlk01-44_1.aiff"\cf0 );\
+h = f.asPraat ;\
+\
+h.createAll;\
+)\
+\
+h.open ;\
+\
+(\
+\cf4 \
+/* Lo-level version */\cf0 \
+\cf4 // -->  if you prefer to set the options\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf0 \
+f = \cf2 SoundFile\cf0 .new;\
+f.openRead(\cf3 "sounds/a11wlk01-44_1.aiff"\cf0 );\
+h = f.asPraat ;\
+h.draw ;\
+h.toSpectrogram ;\
+h.selectViewport(6, 12, 0, 4) ;\
+h.paintSpectrogram ;\
+h.toIntensity ;\
+h.selectViewport(0, 6, 4, 8) ;\
+h.drawIntensity ;\
+h.toPitch ;\
+h.selectViewport(6, 12, 4, 8) ;\
+h.drawPitch(log:\cf2 true\cf0 );\
+h.selectViewport(0, 12, 0, 8) ;\
+h.writeEPS ; \
+h.send ;\
+\
+)\
+\
+h.open\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // In lo-level marks are available\cf0 \
+\
+\
+s.boot ;\
+f = \{ \cf2 RLPF\cf0 .ar(\cf2 Pulse\cf0 .ar([100,250],0.5,0.1), \cf2 XLine\cf0 .kr(8000,400,5), 0.05) \}.fillData(5) ;\
+\cf4 // wait 5 sec\cf0 \
+p = f.asPraat ;\
+s.quit ;\
+\
+(\
+p.toSpectrogram ;\
+p.paintSpectrogram(freqRange:[0,10000]) ;\
+p.markEvery(\cf3 "left"\cf0 , distance: 2000) ;\
+p.oneMark(\cf3 "left"\cf0 , 1516, drawText:\cf3 "1516"\cf0 ) ;\
+p.writeEPS ;\
+p.send\
+)\
+\
+p.open\
+\
+\
+\
+(\
+\
+\cf4 /* This example demonstrates how to work with multiple audio files */\cf0 \
+\
+\cf4 // In asPraat(sndFileName, append)\cf0 \
+\cf4 // sndFileName: specifies a path for the soundfile stored by Praat instance\cf0 \
+\cf4 // mode: if mode = "a", new Praat objects append their script to the existing one \cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 Praat\cf0 .new.init.deleteTmp ;  \cf4 // clean temporary files\cf0 \
+\
+\
+c = [\cf3 "Navy"\cf0 , \cf3 "Maroon"\cf0 , \cf3 "Olive"\cf0 ] ;\
+l = [\cf3 "Plain"\cf0 , \cf3 "Dashed"\cf0 , \cf3 "Dotted"\cf0 ] ;\
+\
+h = \cf2 Signal\cf0 .fill(10, \{\cf2 arg\cf0  i; rrand(-1.0, 1.0)\})\
+		.asPraat(i.asString, \cf2 false\cf0 )			\cf4 // to initialize: praat scirpt is overwritten\cf0 \
+		.selectViewport(0, 6, 0, 2)\
+		.color(c.choose).line(l.choose).lineWidth(rrand(1,8))\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "curve"\cf0 )\
+		.selectViewport(6, 12, 0, 2)\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "speckles"\cf0 )\
+		.selectViewport(12, 18, 0, 2)\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "poles"\cf0 );\
+		\
+h.writeScript(h.script) ;\
+\
+\
+\
+12.do(\{ \cf2 arg\cf0  i; \
+	h = \cf2 Signal\cf0 .fill(10, \{\cf2 arg\cf0  i; rrand(-1.0, 1.0)\})\
+		.asPraat(i.asString, \cf2 true\cf0 )		\cf4 // new praat script appended to old ones\cf0 \
+		.selectViewport(0, 6, i*2+2, (i*2)+4)\
+		.color(c.choose).line(l.choose).lineWidth(rrand(1,8))\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "curve"\cf0 )\
+		.selectViewport(6, 12, i*2+2, (i*2)+4)\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "speckles"\cf0 )\
+		.selectViewport(12, 18, i*2+2, (i*2)+4)\
+		.draw(verticalRange:[-1,1], drawingMethod: \cf3 "poles"\cf0 )\
+		.writeScript(h.script)\
+	\}) ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // Viewport is the active painting area in Praat\cf0 \
+		\
+h.selectViewport(0, 18, 0,24) ; \cf4 // after plotting we select all\cf0 \
+h.writeEPS ;					\cf4 // adds a line telling praat to generate eps\cf0 \
+h.send ;						\cf4 // write the script to file and send it to Praat\cf0 \
+\
+)\
+\
+(\
+\cf4 // wait RESULT = 0\cf0 \
+h.open\
+)\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\fs24 \cf0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf0 (\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 /* 	Lo-res spectrogram of approx 100x100 elements\
+	from inside SC using SwingOSC\
+*/\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  stepY = 100, stepX = 100, maxFreq = 5000 ;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 /* \
+	in some cases it seems that Praat chooses settings by itself.\
+ 	In the following line with maxFreq = 2000 we have to put stepX = 100:\
+ 	so it results in approx 200 steps\
+\
+var stepY = 100, stepX = 200, maxFreq = 2000 ; \
+*/\cf0 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf2 var\cf0  nTimeSteps = stepX, nFreqSteps = maxFreq/stepY ; \
+\cf2 var\cf0  time ;\
+\
+f = \cf2 SoundFile\cf0 .new;\
+f.openRead(\cf3 "sounds/a11wlk01-44_1.aiff"\cf0 );\
+f = f.asPraat ;\
+\
+time = f.array.size/44100/nTimeSteps ;\
+f.exportSpectrogram( timeStep: time, freqStep: nFreqSteps, maxFreq: maxFreq) ;\
+ )\
+\
+\
+(\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 // here we (slowly...) plot it\cf0 \
+p = \cf2 Praat\cf0 .new.importSpectrogram ;\
+p.spectrogram ;\
+\
+p.jSpectrogram ;\
+)\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf7 //last update 30/01/07}

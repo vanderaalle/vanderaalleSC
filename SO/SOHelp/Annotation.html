@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="824.44">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p4 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #606060; min-height: 12.0px}
+p.p5 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #606060}
+p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p7 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco}
+p.p8 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 12.0px Helvetica; color: #9d281b; min-height: 14.0px}
+p.p10 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 12.0px Helvetica}
+p.p11 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p12 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #9d281b}
+p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco}
+p.p14 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #9d281b}
+p.p15 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
+p.p16 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #a03424}
+span.s1 {font: 12.0px Helvetica; color: #000000}
+span.s2 {color: #000000}
+span.s3 {color: #0024b5}
+span.s4 {color: #606060}
+span.s5 {font: 12.0px Helvetica}
+span.s6 {color: #9d281b}
+span.s7 {font: 12.0px Helvetica; color: #9d281b}
+span.s8 {color: #0019ba}
+span.s9 {text-decoration: underline ; color: #072db5}
+span.s10 {color: #072db5}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><br></p>
+<p class="p2"><b>General usage</b></p>
+<p class="p1"><br></p>
+<p class="p3">Let's suppose we have to describe the default SC audio example contained here:</p>
+<p class="p4"><br></p>
+<p class="p5"><span class="Apple-tab-span">	</span>"sounds/a11wlk01.wav"<span class="s1"><span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><br></p>
+<p class="p3">1. Loading a file</p>
+<p class="p1"><br></p>
+<p class="p5"><span class="s2"><span class="Apple-tab-span">	</span>o = </span><span class="s3">SO</span><span class="s2">.new(</span>"sounds/a11wlk01.wav"<span class="s2">) ;</span></p>
+<p class="p1"><br></p>
+<p class="p3">This creates a new SO object and loads a sound file.</p>
+<p class="p3">Some information are accessible by evaluating:</p>
+<p class="p6"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.duration ;</p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.soundPath ;</p>
+<p class="p1"><br></p>
+<p class="p3">If you want to listen to it, you can simply do:</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.play ;</p>
+<p class="p8"><br></p>
+<p class="p3">This creates a new SO object and loads a sound file. Then, you can open the same file e.g. with Praat (Read -&gt;Read from file -&gt;Edit), so that you can explore sonogram interactively.<span class="Apple-converted-space"> </span></p>
+<p class="p3">At first hear, three sound objects can be recognized:</p>
+<p class="p1"><br></p>
+<p class="p3">1. a background noise</p>
+<p class="p3">2. a couple of beep (at the beginning and at the end)</p>
+<p class="p3">3. a child voice</p>
+<p class="p1"><br></p>
+<p class="p3">Apart from a little decrease in dynamics corresponding to the beeps, background noise is constant.</p>
+<p class="p3">So we consider it as a unique sound object, which attack is 0 and duration coincides with sound file duration</p>
+<p class="p3">attack: 0</p>
+<p class="p3">duration: o.duration (Praat would say: 4.283288)</p>
+<p class="p3">We can add a first sound object, named "background":</p>
+<p class="p6"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"background"</span>, 0, o.duration) ;</p>
+<p class="p8"><span class="Apple-tab-span">	</span></p>
+<p class="p3">Then we can add the beeps. Attacks and duration can be retrieved with Praat. The first one:</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"beep1"</span>, 0.123, 0.35) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><br></p>
+<p class="p3">You can hear it by evaluating:</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.play(<span class="s4">"beep1"</span>) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><br></p>
+<p class="p3">You may not be satisfied with the time boundaries. The easiest way is to interactively test by simply re-adding the sound object and playing it. Re-adding overwrites the previous sound object (there cannot be two sound objects with the same name).</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"beep1"</span>, 0.123, 0.32) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.play(<span class="s4">"beep1"</span>) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"beep1"</span>, 0.123, 0.3) ; <span class="s6">// that 's it</span><span class="s7"><span class="Apple-converted-space"> </span></span></p>
+<p class="p9"><span class="Apple-tab-span">	</span></p>
+<p class="p10">The same goes for the second beep:</p>
+<p class="p8"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"beep2"</span>, 3.8, 0.37) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.play(<span class="s4">"beep2"</span>) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p11"><br></p>
+<p class="p10">If you want to see what is the current state of your objectDictionary:</p>
+<p class="p11"><span class="Apple-tab-span">	</span></p>
+<p class="p12"><span class="s1"><span class="Apple-tab-span">	</span></span><span class="s2">o.print <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>// prints all</p>
+<p class="p12"><span class="s2"><span class="Apple-tab-span">	</span>o.print(</span><span class="s4">"beep1"</span><span class="s2">) <span class="Apple-tab-span">	</span></span>// the one you want<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p11"><br></p>
+<p class="p10">The difficult case is the voice. There are two possible criteria:</p>
+<p class="p10">- to consider the whole utterance as a unique sound object. This would respect the figurative labelling (background, beeps, voice). More, the voice presents homogeneous properties, at least if compared to the other two sound object types.</p>
+<p class="p10">- to decompose the voice. The rationale is that the fricative block is very different typologically from the other syllables. More, the syllables clearly respects the articulation/sustain criterium requested by Schaeffer (to be precise: the criterium is modelled after voice).</p>
+<p class="p11"><br></p>
+<p class="p10">Following the secon criterium, we may have:</p>
+<p class="p8"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"[kA'-l:m]"</span>, 0.35, 0.71) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"[bi-e']"</span>, 1.05, 0.65) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"[tSys]"</span>, 1.91, 0.6) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"[der]"</span>, 2.8, 0.23) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.add(<span class="s4">"[ovA]"</span>, 3.19, 0.6) ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p11"><span class="Apple-tab-span">	</span></p>
+<p class="p3">Names are given following a very approximative phonetic transcription (UTF support in SuperCollider would be needed, but labels are just intended as aides-mémoires).</p>
+<p class="p3">Still, we have not provided typo-morphological information. This is evident by inspecting the dictionary containing the objects:</p>
+<p class="p1"><span class="Apple-tab-span">	</span></p>
+<p class="p13"><span class="s5"><span class="Apple-tab-span">	</span></span>o.print</p>
+<p class="p1"><br></p>
+<p class="p3">Even if it is possible to immediately provide<span class="Apple-converted-space">  </span>values for all the parameters, it is easy to assign them by exploring the typological space. This can be done by evaluating:</p>
+<p class="p1"><br></p>
+<p class="p13"><span class="s5"><span class="Apple-tab-span">	</span></span>p = <span class="s8">SOSpace</span>.new(o) ;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><br></p>
+<p class="p3">The sound objects are represented by squares. The three views represent the upper, front and lateral side of the typological space, like in a flattened paper box. They<span class="Apple-converted-space">  </span>are indeed correlated: moving a sound object in a view determines a related moving in one of the other two views.</p>
+<p class="p3">The typological space is defined by profile, caliber, variation.<span class="Apple-converted-space">  </span>As we have still not provided the relevant typological information, a random position is assigned to sound objects and they are randomly scattered all over the space. By clicking with mouse on one of them, it gets selected, and its definition appears in the info panel. Changing the position by dragging it updates the info panel. The contrary applies too. If you change the value on the info panel and press Return, changes are stored and -if needed- the position in the space is updated.<span class="Apple-converted-space"> </span></p>
+<p class="p3">Through the info panels the values of all parameters can be assigned. More, the entry widget at the right of "Name" allows to rename the sound object.</p>
+<p class="p3">As we have not provided a group index, all objects are by default grouped together in the group 0.<span class="Apple-converted-space"> </span></p>
+<p class="p3">Groups are integers which allows for useful grouping, i.e. like voices or layers.<span class="Apple-converted-space"> </span></p>
+<p class="p3">We can identify three groups by assigning a different group index: the background, the beeps, the vocal utterances. Group indices must not be consecutive, they only have to be different integers (e.g. 3, 45, 123 is fine, even if a bit eccentric).</p>
+<p class="p1"><br></p>
+<p class="p3">The same can<span class="Apple-converted-space">  </span>be obtained by evaluating:</p>
+<p class="p1"><br></p>
+<p class="p13"><span class="Apple-tab-span">	</span>(</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"background"</span>, 0) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"[ovA]"</span>, 1) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"[tSys]"</span>, 1) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"[der]"</span>, 1) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"[bi-e']"</span>, 1) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"[kA'-l:m]"</span>, 1) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"beep1"</span>, 2) ;</p>
+<p class="p13"><span class="Apple-tab-span">	</span>o.changeGroup(<span class="s4">"beep2"</span>, 2)<span class="Apple-converted-space"> </span></p>
+<p class="p13"><span class="Apple-tab-span">	</span>)</p>
+<p class="p1"><br></p>
+<p class="p3">Background is noisy, so its caliber tends to be large, but not maximum (i.e. white noise), so 1.7. More, its site (lowest register) tends to be placed in the low register (0). Dynamically, it is ppiano (2). Variation is null (0).<span class="Apple-converted-space">  </span>Sustain is sustained (.e. continuous), negative. Profile is strictly amorphous (but not artificial, hence -2.4).</p>
+<p class="p3">Note that the previous text can be inserted in the text field.</p>
+<p class="p3">If using textual interrface, in order not to deal with temporal information we can use changeFeatures:</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"background"</span>, -2.4, 1.7, 0.0, 0, 2, 0, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p11"><span class="Apple-tab-span">	</span></p>
+<p class="p3">The beeps are substantially two repetitions of the same object. They are surely pitched, so their mass is notal (0.0 &lt; caliber &lt; 1.0): we can assign 0.2. They are continuous, so sustain is negative, and they are amorphous, but due to short duration they do not reach the maximum (i.e. in some way they are still "notes"): hence -2. Variation is null (0). Site is very acute (6). Dynamics is a bit greater tha background, so 2.</p>
+<p class="p3">We have:</p>
+<p class="p1"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"beep1"</span>, -2, 0.2, 0.0, 6, 3, 2, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"beep2"</span>, -2, 0.2, 0.0, 6, 3, 2, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><br></p>
+<p class="p3">Vocal sounds are in acute register (site: 5), with limited caliber (0.3), apart<span class="Apple-converted-space">  </span>[tSys], distinclty more noisy, falling in the second half of caliber range (1.1). Their dynamics, at least if compared ti the other groups is forte and substantially homogeneous (5): they are distinctively in the foreground. They are continuous, and typically notal (profile = -1.0). Variation differs in each sound object, the first two being tow distinct glissandos, [der] and [ova] beign almost static, [tSys] being a portando over approx a fourth, but with a clear sustained midpoint. Hence:</p>
+<p class="p8"><br></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"[kA'-l:m]"</span>, <span class="Apple-tab-span">	</span>-1, 0.3, 0.7, 5, 5, 1, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"[bi-e']"</span>, <span class="Apple-tab-span">	</span>-1, 0.3, 0.7, 5, 5, 1, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"[tSys]"</span>, <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>-1, 1.1, 0.5, 5, 5, 1, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"[der]"</span>, <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>-1, 0.3, 0.2, 5, 5, 1, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p7"><span class="Apple-tab-span">	</span>o.changeFeatures(<span class="s4">"[ovA]"</span>, <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>-1, 0.3, 0.3, 5, 5, 1, "") ;<span class="s5"><span class="Apple-converted-space"> </span></span></p>
+<p class="p1"><br></p>
+<p class="p3">It is possible to save the data by evaluating:</p>
+<p class="p1"><br></p>
+<p class="p14"><span class="s1"><span class="Apple-tab-span">	</span></span><span class="s2">o.save(</span><span class="s4">"/typoTest.txt"</span><span class="s2">) </span>// the name and the path you prefer</p>
+<p class="p1"><br></p>
+<p class="p3">Symmetrically, a file can be open by evaluating:<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span></p>
+<p class="p5"><span class="s2"><span class="Apple-tab-span">	</span>o = </span><span class="s3">SO</span><span class="s2">.new(</span>"sounds/a11wlk01.wav"<span class="s2">) ;</span><span class="s1"> </span><span class="s6">// if there's no SO</span></p>
+<p class="p14"><span class="s2"><span class="Apple-tab-span">	</span>o.open(</span><span class="s4">"/typoTest.txt"</span><span class="s2">) </span>// the name and the path you prefer</p>
+<p class="p13"><span class="s6"><span class="Apple-tab-span">	</span></span>o.print ;</p>
+<p class="p1"><br></p>
+<p class="p3">The SOSpace shows a concentration on the right, continuous and the frontal, constant sides of the space.</p>
+<p class="p3">Finally, we can draw a score exploiting the temporal information.</p>
+<p class="p3">Simply:</p>
+<p class="p1"><span class="Apple-tab-span">	</span></p>
+<p class="p13"><span class="s5"><span class="Apple-tab-span">	</span></span>c = <span class="s3">SOScore</span>(o)</p>
+<p class="p1"><br></p>
+<p class="p1"><br></p>
+<p class="p2"><b>Categories</b></p>
+<p class="p1"><br></p>
+<p class="p3">bit eccentric).</p>
+<p class="p1"><br></p>
+<p class="p3"><b>See also: </b><a href="../ServerArchitecture/Buffer.html"><span class="s9">Buffer</span></a><b> </b>[other related help files]</p>
+<p class="p1"><br></p>
+<p class="p2"><b>More detailed examples</b></p>
+<p class="p15"><br></p>
+<p class="p16"><span class="s2">b = </span><span class="s10">SomeClass</span><span class="s2">.new(s, 100, 2); <span class="Apple-tab-span">	</span></span>// explanation of this line</p>
+<p class="p16"><span class="s2">b.doSomething;<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>// explanation of this line</p>
+<p class="p7">b.cleanUp</p>
+<p class="p8"><br></p>
+<p class="p7">...</p>
+</body>
+</html>

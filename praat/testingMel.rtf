@@ -1,0 +1,94 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fnil\fcharset77 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green0\blue0;\red0\green0\blue191;
+\red96\green96\blue96;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs18 \cf2 \
+\cf3 /* 	Lo-res spectrogram of approx 100x100 elements\
+	from inside SC using SwingOSC\
+*/\cf2 \
+\
+(\
+\cf3 // the source\cf2 \
+f = \cf4 SoundFile\cf2 .new;\
+f.openRead(\cf5 "sounds/a11wlk01-44_1.aiff"\cf2 );\
+\cf3 /*\
+s.boot ;\
+f = \{SinOsc.ar\}.fillData ;\
+s.quit ;\
+*/\cf2 \
+f = f.asPraat ;\
+)\
+\
+(\
+\cf4 var\cf2  stepY = 100, stepX = 100, maxFreq = 5000 ;\
+\
+\cf3 /* \
+	in some cases it seems that Praat chooses settings by itself.\
+ 	In the following line with maxFreq = 2000 we have to put stepX = 100:\
+ 	so it results in approx 200 steps\
+\
+var stepY = 100, stepX = 200, maxFreq = 2000 ; \
+*/\cf2 \
+\
+\cf4 var\cf2  nTimeSteps = stepX, nFreqSteps = maxFreq/stepY ; \
+\cf4 var\cf2  time, first, last, distance ;\
+\
+\
+time = f.array.size/44100/nTimeSteps ;\
+\cf3 //first = 21.midicps.cpsmel ;\cf2 \
+\cf3 //last = 108.midicps.cpsmel ;\cf2 \
+first = -20.midicps.cpsmel ;\
+last = 108.midicps.cpsmel ;\
+\
+\cf3 // distance = (last - first)/200 ;\cf2 \
+\
+distance = 5 ; \
+\cf3 // 5 mels starting from -20 gives complete representation of low register\cf2 \
+\cf3 // even if you have too many data for high register\cf2 \
+\cf3 // range: [-6, 126]. Totally represented range: [24, 126]\cf2 \
+\
+\
+f.exportMelFilter( timeStep: time, positionOfFirst: first, distanceBetween: distance, 	maximumFrequency:  120.midicps ) \cf3 // should be last but seems not to work\cf2 \
+ \
+\
+)\
+\
+\
+f.createSpectrogram\
+\
+f.open\
+\
+(\
+i = 50 ;\
+p = \cf4 MelFilter\cf2 .new.importMelFilter ;\
+p.createPitchList ;\
+p.pitchList.do(\{\cf4 arg\cf2  i; i.postln\}) ;\
+\cf3 //p.melFilter ;\cf2 \
+p.binarize(0.75) ;\
+p.xmax; p.y1;\
+\cf3 //p.postSliceT(i).jSlice(i) ;\cf2 \
+\cf3 //p.jMelFilter\cf2 \
+)\
+\
+\
+(\
+a = \cf4 MelFilter\cf2 .new.importMelFilter ;\
+\
+a.createPitchList ;\
+\
+a.createPitchDict ;\
+\
+//a.pitchDict.keys.asArray.sort\
+\
+a.createPitchFilter(43, 100) ;\
+\
+a.pitchFilter = a.pitchFilter.normalize2D.thresh(0.6) ;\
+\
+a.pitchFilter.jFilter(6,6) ;\
+\
+)\
+\
+\
+}

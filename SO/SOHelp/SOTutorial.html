@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="824.44">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 18.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p5 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #9d281b}
+p.p6 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #606060}
+p.p7 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica; min-height: 17.0px}
+p.p9 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco}
+p.p10 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco}
+p.p11 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #9d281b}
+p.p12 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #9d281b; min-height: 12.0px}
+p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+span.s1 {color: #000000}
+span.s2 {color: #0024b5}
+span.s3 {color: #606060}
+span.s4 {font: 9.0px Monaco; color: #606060}
+span.s5 {color: #9d281b}
+span.s6 {font: 12.0px Helvetica}
+span.s7 {font: 12.0px Helvetica; color: #000000}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><b>SO tutorial</b></p>
+<p class="p2"><br></p>
+<p class="p3"><b>Background</b></p>
+<p class="p2"><br></p>
+<p class="p4">The SO project aims at providing some tools for annotating sound objects with respect to typo-morphological categories developed following Pierre Schaeffer's theory.</p>
+<p class="p2"><br></p>
+<p class="p4">Some theoretical background is provided by:</p>
+<p class="p4">- Valle, A. "A typological space for representing collections of sound objects", <i>The ‘languages’ of electroacoustic music - Leicester - EMS07</i>, EMS Proceedings and Other Publications, http://www.ems-network.org/spip.php?article290</p>
+<p class="p4">- Lombardo, V., Valle, A., <i>Audio e multimedia</i> [Italian], Milan, Apogeo, 3rd ed. 2008.</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p4">In particolar the focus is on data visualization and interaction. Shortly, the idea is that you can annotate interactively a sound file and generate a visual representation of the annotation data.</p>
+<p class="p4">The package is made up of<span class="Apple-converted-space"> </span></p>
+<p class="p4">1. the core class SO</p>
+<p class="p4">2. the GUI classes SOSpace, SOScore, SOGui</p>
+<p class="p4">3. the exporter classes SOProcessing and SONodeBox.</p>
+<p class="p4">The GUI classes are built on top of the core class. This simply means that all the functionalities are already present in the SO class, and that every operation can be controlled by sending the opportune messages to SO.</p>
+<p class="p4">In this tutorial, we will focus more generaly on the annotation process and more specifically on the GUI interfaces. Information on class behavior can be retrieved from each class' help file.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>Annotation: operations</b></p>
+<p class="p2"><br></p>
+<p class="p4">The annotation process requires two distinct operations. First, the audio file to be analyzed must be divided into sound objects. This operation can be named as "partition". After the partition, each sound object (hence on: "so") will be identified by a label and by its temporal boundaries (in the form of attack+duration information). The seccond operation is the classification, and it consist in annotating each of the sound object by providing a numerical value for each of the proposed parameters.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>Annotation: partition</b></p>
+<p class="p2"><br></p>
+<p class="p4">Even if it is possible to perform a partition from inside SO, indeed this is not the easiest way. The easy way is to use an audio editor, so that the audio file to be annotated can be explored interactively, e.g. exploiting a sonograpical representation.<span class="Apple-converted-space">  </span>For this operation, one can consider open source softwares like Praat (http://www.praat.org) or Sonic Visualiser (http://www.sonicvisualiser.org).<span class="Apple-converted-space"> </span></p>
+<p class="p4">The partition data can be stored in a ASCII file (e.g. a .txt file) in this form</p>
+<p class="p2"><br></p>
+<p class="p4">name<span class="Apple-tab-span">	</span>attack<span class="Apple-tab-span">	</span>duration</p>
+<p class="p2"><br></p>
+<p class="p4"><b>Important</b>: note that each column is separated by tabs (<b>not</b> spaces, just one tab).</p>
+<p class="p4">These data can then be imported into SO (see later).</p>
+<p class="p2"><br></p>
+<p class="p4">But the easiest way is to use Audacity (http://audacity.sourceforge.net/) as a partitioning tool.</p>
+<p class="p4">In short, in Audacity you have to:</p>
+<p class="p4">- create a new project (just open the sw)</p>
+<p class="p4">- import the audio file (File --&gt; Import)</p>
+<p class="p4">- In general, in SO it is better to use mono files (even if stereo is supported): in case of stereo files, you can<span class="Apple-converted-space">   </span></p>
+<p class="p4"><span class="Apple-converted-space"> </span>simply use Tracks --&gt; Stereo To Mono</p>
+<p class="p4">- you can export the resulting mono file with File --&gt; Export As</p>
+<p class="p4">- you can view the sonogram of the file by selecting "Spectrum" on the menu appearing when you press the arrow head<span class="Apple-converted-space">  </span>in the track view.</p>
+<p class="p4">- after selecting the region of the file you are interested in, you can add a label by doing Tracks --&gt; Add Label at Selection (there is also a key shortcut). In this way, you can add all the labels you need, each label representing the name of a so.</p>
+<p class="p4">- you can save the Audacity project with File --&gt; Save As, so that you can edit later the labels</p>
+<p class="p4">- most important, the labels can be exported to a text file by File --&gt; Export Labels</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p4"><span class="Apple-converted-space"> </span>These data can then be imported into SO (see later).</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p3"><b>Classification: startup<span class="Apple-converted-space"> </span></b></p>
+<p class="p2"><br></p>
+<p class="p4">After creating a new file in SC, you have to create an annotation object. You can easily do this by:</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so = </span><span class="s2">SO</span><span class="s1">.new(</span><span class="s3">"/myFile.wav"</span><span class="s1">); <span class="Apple-tab-span">	</span></span>// creates an object and load a sound file</p>
+<p class="p2"><span class="Apple-converted-space"> </span></p>
+<p class="p4">If you are not used to SuperCollider, you can simply replicate the code as it is (we are using environmental variables for session interaction), apart from replacing the block <span class="s4">"/myFile.wav"</span> with the path of the audio file.</p>
+<p class="p4">In this way, a new object ~so is created, and an audi file is associated to it.</p>
+<p class="p4">If you have hand written a text file with annotation data you can import it by:</p>
+<p class="p2"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.import(</span><span class="s3">"/myHandAnnotation.txt"</span><span class="s1">); <span class="Apple-tab-span">	</span></span>// creates an object and load a sound file</p>
+<p class="p2"><br></p>
+<p class="p4">Again, you have to replace <span class="s4">"/myHandAnnotation.txt" </span>with the path of your txt file.<span class="Apple-converted-space"> </span></p>
+<p class="p4">In case you have exported a label file from Audacity, you can do instead:</p>
+<p class="p2"><br></p>
+<p class="p6"><span class="s1"><span class="Apple-tab-span">	</span>~so.fromAudacity(</span>"/myAudacityAnnotation.txt"<span class="s1">); <span class="Apple-tab-span">	</span></span><span class="s5">// import Audacity labels</span></p>
+<p class="p2"><br></p>
+<p class="p4">Intuitively, you have to replace <span class="s4">"/myAudacityAnnotation.txt" </span>with the path of your txt file exported form Audacity.<span class="Apple-converted-space"> </span></p>
+<p class="p4">In order to save your data, you can do (at every moment you want):</p>
+<p class="p7"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.save(</span><span class="s3">"/myAnnotation.txt"</span><span class="s1">); <span class="Apple-tab-span">	</span></span>// saves the annotation file in ASCII internal format</p>
+<p class="p2"><br></p>
+<p class="p4">Intuitively, you have to replace <span class="s4">"/myAudacityAnnotation.txt" </span>with the path of your annotation txt file.<span class="Apple-converted-space"> </span></p>
+<p class="p4">Such a file can be open again by evaluating:</p>
+<p class="p7"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.open(</span><span class="s3">"/myAnnotation.txt"</span><span class="s1">); <span class="Apple-tab-span">	</span></span>// re-open the annotation file<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p4">You can always print on the screen the information related to an object:</p>
+<p class="p2"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.print(</span><span class="s3">"theNameOfMySo"</span><span class="s1">); <span class="Apple-tab-span">	</span></span>// print a description of the so<span class="Apple-converted-space"> </span></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.print; <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>// no name provided: all the sos<span class="Apple-converted-space"> </span></p>
+<p class="p8"><b></b><br></p>
+<p class="p3"><b>Classification: the typological space<span class="Apple-converted-space"> </span></b></p>
+<p class="p2"><br></p>
+<p class="p4">In order to classify each object in relation to typological categories, a GUI is provided, internally named SOSpace.<span class="Apple-converted-space"> </span></p>
+<p class="p4">You can create a SOSpace by evaluating:</p>
+<p class="p2"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.makeSpace ; <span class="Apple-tab-span">	</span></span>// creates the typological space</p>
+<p class="p2"><br></p>
+<p class="p4">The SOSpace allows to organize/explore the resulting sound objects in a 3D typological space. The space is flattened orthogonally over a 2D surface. Each square represents a so: by moving it, the so's profile, caliber and variation (on the left) are updated. Analogously, if you specifiy in the entry fields a value and press Return, the value is assigned to the param (in case of profile, caliber, variation, the position of the square in the space is updated too). If you want to rename the so, you can specify a new name in the entry field at the right of the name label, and press Return. Also, you can add your notes in the Text field: just note that you can only use ASCII charracters (e.g. not "è").</p>
+<p class="p4">The colour of each square depends on its group (a group can be used for "layers", "voices", "so families", etc.). Each time a square is selected, the corresponding so is played.</p>
+<p class="p4">If there are no profile/caliber/variation values when opening the file (like in our case), random values are assigned.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>Classification: the GUI window</b></p>
+<p class="p2"><br></p>
+<p class="p4">Another GUI is the SOGui, which is pretty the same of the entry component of the SOSpace, but with some added functionalities.</p>
+<p class="p4">You can create a SOGui by evaluating:</p>
+<p class="p2"><br></p>
+<p class="p9"><span class="Apple-tab-span">	</span>~so.makeGui ; <span class="Apple-tab-span">	</span><span class="s5">// creates a gui</span></p>
+<p class="p2"><br></p>
+<p class="p4">By providing a so's name, you can select it and change its parameters. Every time you press Return in the name field, it is played again. More, you have a button on the left which allows to play a sinusoid: the two sliders allows to control its pitch and its amplitude. By comparing the so properties to the sinusoid, you can assign site and dynamics.</p>
+<p class="p2"><br></p>
+<p class="p3"><b>Classification: the SOScore</b></p>
+<p class="p2"><br></p>
+<p class="p4">While SOSpace discards temporal information (it considers the annotated sound objects as an unordered collection), the SOScore plots on a window a score-like representation of the collection, thus regaining temporal information. In the score, the x-axis represents time, the y-axis the pitch axis.</p>
+<p class="p4">While the other GUIs are interactive (i.e. they are both viewers and controllers), the score is only a viewer: it gets updated if you change some parameters, but you cannot use it to input data.</p>
+<p class="p7"><br></p>
+<p class="p5"><span class="s1"><span class="Apple-tab-span">	</span>~so.makeScore ; <span class="Apple-tab-span">	</span></span>// creates a SOScore</p>
+<p class="p2"><br></p>
+<p class="p4">The visualization uses the following mapping:</p>
+<p class="p2"><br></p>
+<p class="p4">- a so is represented by a rectangle</p>
+<p class="p4">- the height of the rectangle represents the caliber</p>
+<p class="p4">- its lower corner the site</p>
+<p class="p4">- its color the group</p>
+<p class="p4">- the string on the top-left corner is the name</p>
+<p class="p4">- a circle on the top-left corner indicates impulsive sustain, a set of vertical lines iterative one. Else, the so is sustained</p>
+<p class="p4">- the diagonal line represents the profile: if goes from the minimum of anamorphism (the line being the diagonal of the rectangle) to the maximum of amorphism (the line being no more diagonal, but horizontal).<span class="Apple-converted-space"> </span></p>
+<p class="p4">- the resulting polygon is filled with grey. The grey values represent dynamics (white: minimum, black: maximum)<span class="Apple-converted-space"> </span></p>
+<p class="p4">- the density of dots per surface unit represents variation (the denser, the more variation). Note: this could change in the future.</p>
+<p class="p4">In the visualization you can control the time interval by setting to and from:</p>
+<p class="p2"><br></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.from = 10 ; <span class="Apple-tab-span">	</span><span class="s5">// now score starts at 10</span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.to = 20 ; <span class="Apple-tab-span">	</span><span class="s5">// and it ends at 20</span></p>
+<p class="p11"><span class="s7"><span class="Apple-converted-space"> </span></span><span class="s1"><span class="Apple-tab-span">	</span>~so.score.from = </span><span class="s2">nil</span><span class="s1"> ; <span class="Apple-tab-span">	</span></span>// nil = from the beginning</p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.to = <span class="s2">nil</span> ; <span class="Apple-tab-span">	</span><span class="s5">// nil = to the end</span></p>
+<p class="p2"><br></p>
+<p class="p4">The time interval is controlled by:</p>
+<p class="p2"><br></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.tickInterval = 2 ; <span class="Apple-tab-span">	</span><span class="s5">// vertical bars every 5 secs</span></p>
+<p class="p2"><br></p>
+<p class="p4">You can decide what categories to plot by setting to true/false the corresponding attributes:</p>
+<p class="p2"><br></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.variation = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.profile = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.sustain = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.name = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.ticks = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.register = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.timeLabels = <span class="s2">false</span> ;<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.width = 500 ; <span class="s5">// in pixel</span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.height = 50 ; <span class="s5">// in pixel<span class="Apple-converted-space"> </span></span></p>
+<p class="p11"><span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span>// I don't know why, but to obtain right effect for height you have to re-evaluate<span class="Apple-converted-space"> </span></p>
+<p class="p10"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="Apple-tab-span">	</span>~so.score.width = 500 ; <span class="s5">// in pixel</span></p>
+<p class="p2"><br></p>
+<p class="p4">If you set the values to true, you have them re-plotted again on the window.</p>
+<p class="p2"><br></p>
+<p class="p4">The space, the gui, the score are all correlated: if you change a value in one of them, the other are updated (if necessary). If you use the score<span class="Apple-converted-space">  </span>while working interactively, it is safer to set variation to false. Otherwise, it can be too demanding to update it.</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p3"><b>Exporting the results</b></p>
+<p class="p2"><br></p>
+<p class="p4">In order to create an image file containing the score or the space, the simplest way to proceed is to take a screenshot from the GUI objects. In the case of the score, it is also possible to export the data to drawing softwares, so that an image file can be created (in particular, a pdf file is relevant here, as it saves in high-quality, vectorial format).<span class="Apple-converted-space"> </span></p>
+<p class="p4">The softwares are Processing and NodeBox. Both are open source and are controlled by code. Shortly, the export process results in the creation of a text file containing the instructions for the chosen software. You have only to run the rendering.</p>
+<p class="p4">Processing (http://processing.org/) is specialized in real-time graphics, but it also includes pdf exporting capabilities. It is fully cross-platform. Limitation: fonts must be included in the project folder, so in the score it is not possible to export the text.<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p11"><span class="s1"><span class="Apple-tab-span">	</span>~so.score.toProcessing<span class="Apple-tab-span">	</span></span>// creates a pde (Processing) file</p>
+<p class="p12"><br></p>
+<p class="p4">NodeBox (http://nodebox.net/) is specialized in 2D graphics. It handles natively pdfs. There are no problems with system fonts. Limitation: it is Mac only.</p>
+<p class="p13"><span class="s6"><span class="Apple-converted-space"> </span></span><span class="s5"><span class="Apple-tab-span">	</span></span></p>
+<p class="p11"><span class="s1"><span class="Apple-tab-span">	</span>~so.score.toNodeBox ; <span class="Apple-tab-span">	</span></span>// creates a py (NodeBox) file</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p4">In both cases the resulting files are created in the audio file folder. They can be open from the programs, and then rendered (NodeBox: Python --&gt; Run, Processing: Sketch --&gt; Run ).</p>
+<p class="p4">The resulting images mantains the score attributes you have set before (e.g. variation<span class="Apple-converted-space">  </span>= false).</p>
+<p class="p2"><br></p>
+</body>
+</html>
