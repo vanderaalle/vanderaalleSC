@@ -2,7 +2,7 @@
 
 Syntax Colorizer in ps/pdf for SC, requires SCLexer.
 
-24/02/13
+AV scripsit 24/02/13
 
 Color scheme:
 
@@ -138,7 +138,7 @@ PsCodeWriter {
 	}
 
 	setWidth {
-		height = if (height.isNil) {source[0].count{|i| i==$\n}+1*fontSize*inBetween}{height} ;
+		height = if (height.isNil) {source[0].count{|i| i==$\n}+3*fontSize*inBetween}{height} ; // was 1*fontSize
 		str = str++"% document size\n";
 		str = str++"<< /PageSize [X Y] >> setpagedevice\n"
 			.replace("X", width+(frame*2))
@@ -200,19 +200,19 @@ PsCodeWriter {
 				frameCol.do{|i| str = str++i.asString++" "};
 				str = str++"setrgbcolor\n" ;
 					str = str++(fontSize*0.6000975*(y+1).asString.size.neg-5).asString++" "
-					++(height-(y*fontSize*inBetween))++" moveto\n" ;
+					++(height-((y+1)*fontSize*inBetween))++" moveto\n" ;
 					str = str++"("++(y+1).asString++") show\n" ;
 				flag = false ;
 				col = frameCol ;
-				col = this.setCol(type, col)
+				col = this.setCol(type, col) ;
 				} ;
 				col = this.setCol(type, col) ;
 				lexeme = this.createLine(lexeme) ;
-				str = str++(x*fontSize*0.6000975)++" "++(height-(y*fontSize*inBetween))++" moveto\n" ;
+				str = str++(x*fontSize*0.6000975)++" "++(height-((y+1)*fontSize*inBetween))++" moveto\n" ;
 				str = str++"("++lexeme++") show\n" ;
 				x = x+lexeme.size ;
 				// special case for ps syntax
-				if(['\\(','\\)'].includes(lexeme.asSymbol) ) { x = x-1 }
+				if(['\\(','\\)'].includes(lexeme.asSymbol) ) { x = x-1 } ;
 			}
 		} ;
 

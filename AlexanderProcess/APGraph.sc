@@ -10,18 +10,18 @@
 
 
 APGraph {
-	
+
 	var <>graphDict ;	//
 	var <>vNum, <>eNum ; // a counter for unique edges and vertices ID
-	var <>on, <>off ; // two sets for activity bookkeeping 
+	var <>on, <>off ; // two sets for activity bookkeeping
 	var <>activationDur ; // time interval for edge process
 	var <>task ; // the reactivation task
 	var <>prob ; // reswitch prob
 	var <>zeroTime ; // we start counting time here
 	var <>events ; // we collect here the events
-		
+
 	*new { arg dur = 1, prob = 0.5 ;
-		^super.new.initGraph (dur, prob)	
+		^super.new.initGraph (dur, prob)
 	}
 
 	initGraph { arg d, p ;
@@ -36,47 +36,47 @@ APGraph {
 				// intersection between on and edges not void
 				if ((on & graphDict[v][1]).size > 0)
 					{ // throw dice and eventually activate
-						if (prob.coin) { graphDict[v][0].activate} 
-					}				
+						if (prob.coin) { graphDict[v][0].activate}
+					}
 				} ;
 			// wait
-			activationDur.wait 
+			activationDur.wait
 				}
 			}) ;
 	}
-	
+
 	reset {this.initGraph (activationDur, prob) ; this.changed}
-	
+
 	/* Storing/retrieving in internal format */
-	
+
 	// for consistence use .gra extension
 	write { arg path ;
 		this.writeArchive(path)
 	}
-	
+
 	// this means you can do:
-	// a = Graph.read("/test.gra")	
+	// a = Graph.read("/test.gra")
 	*read { arg path ;
 		^Object.readArchive(path) ;
-		
+
 	}
 	/**/
 
 
-/*	Basic usage */	
-	
+/*	Basic usage */
+
 	// add an empty vertex
 	// so that it exists
-	
-	addVertex { arg dur = 1, prob = 0.5 ;	
+
+	addVertex { arg dur = 1, prob = 0.5 ;
 		var vID = vNum;
 		graphDict.add(vID -> [APVertex.new(dur, prob, vID, this), Set[]]) ; // 2nd set for edges
 		vNum = vNum + 1 ;
 		this.changed;
 		^vID; //return the vID created so that external application could reuse it to modify vertex info
 	}
-	
-		
+
+
 	// add an edge
 	addEdge { arg start, end ;
 		// adding the edge arr
@@ -92,21 +92,21 @@ APGraph {
 /* setting up process */
 
 
-// here we start the vertex process	
+// here we start the vertex process
 	activateVertex { arg v ; graphDict[v][0].activate }
 
-	activateVertices { arg arr = [] ; 
-		graphDict.keys.asArr.do{|v| this.activateVertex(v) }
+	activateVertices { arg arr = [] ;
+		graphDict.keys.asArray.do{|v| this.activateVertex(v) }
 	}
 
 	// this collects times --> zeroTime
-	activateAll { 
+	activateAll {
 		zeroTime = thisThread.seconds ;
 		vNum.do{|v| this.activateVertex(v) }
 	}
 
-	
-	event { arg id ; 
+
+	event { arg id ;
 		var ev = [thisThread.seconds-zeroTime, id];
 		("an event has been generated: "+id).postln ;
 		events = events.add(ev);
@@ -114,51 +114,51 @@ APGraph {
 		}
 
 // now the edge process
-	
-	reactivate { arg flag = true; 
+
+	reactivate { arg flag = true;
 		if (flag) {task.start}{task.stop} }
-	
-	
-	
-	
-/*	
+
+
+
+
+/*
 
 /* Generation and processing methods */
 
 
-	createRandom { arg nameList, eNum = 10, eMin = 1, eMax = 1 ; 
+	createRandom { arg nameList, eNum = 10, eMin = 1, eMax = 1 ;
 		// a list of symbols, number of  edges connecting the list
-		// max and min duration 
+		// max and min duration
 		var start, end, dur, label ;
 			nameList.do({ arg label ;
 			this.addVertex(1200.rand, 800.rand, 0, label:label)
 		}) ;
-		
+
 		eNum.do({ arg i ;
 			start = nameList.size.rand+1 ;
 			//label = nameList[start] ;
 			end = nameList.size.rand+1 ;
 			dur = rrand(eMin.asFloat, eMax.asFloat) ;
 			this.addEdge(start, end, dur) ;
-		}) ;	
+		}) ;
 		this.changed ;
 	}
 
 	// there are two strategies:
 	// 1. add in and out to each vertex if lacking
 	// 2. cut a vertex without one in and one out
-	makeCyclic { 
+	makeCyclic {
 	}
-	
+
 	// check me please
 	createRandomCyclic { arg nameList = [], eNum = 10, eMin = 1, eMax = 1, noLoop = true ;
 		// a list of symbols,
-		// number of  edges connecting the list beyond I/O 
-		// max and min duration 
+		// number of  edges connecting the list beyond I/O
+		// max and min duration
 		var start, end, dur, cleanNameList, label, arr ;
-	
+
 		this.createRandom(nameList, eNum, eMin, eMax) ;
-		
+
 		nameList.size.do({ arg vertex ;
 			arr = Array.series(10)+1 ;
 			if (noLoop, { arr.remove(vertex+1) }) ;
@@ -168,20 +168,20 @@ APGraph {
 			this.addEdge(start, vertex+1, dur) ;
 			dur = rrand(eMin.asFloat, eMax.asFloat) ;
 			this.addEdge(vertex+1, end, dur) ;
-		}) ;	
+		}) ;
 		this.changed ;
 	}
-*/	
-			
+*/
+
 }
 
 APScoreGui {
-	
+
 	var <>graph, <>dict, <>window, <>w, <>h;
-	var <>windowSize ; // in sec, how much time to display	
+	var <>windowSize ; // in sec, how much time to display
 
 	*new { arg apGraph, w = 800, h = 400, windowSize = 60 ;
-		^super.new.initScoreGui (apGraph, w, h, windowSize)	
+		^super.new.initScoreGui (apGraph, w, h, windowSize)
 	}
 
 	initScoreGui { arg ag, ww, hh, ws ;
@@ -189,14 +189,14 @@ APScoreGui {
 		w = ww ; h = hh ; windowSize = ws ;
 		dict = IdentityDictionary.new ;
 		graph.addDependant(this) ;
-		
+
 		window = Window( "Alexander Process Score Graph", Rect( 100, 200, w, h ), resizable: false ).front;
 
-	window.drawHook = {
+	window.drawFunc = {
 		var x, y, r, yl ;
 		Pen.fillColor_(Color.black) ;
-		Pen.strokeColor_(Color.black) ; 	
-		graph.vNum.do{|i| 
+		Pen.strokeColor_(Color.black) ;
+		graph.vNum.do{|i|
 			yl = i.linlin(0, graph.vNum, 50, h-50) ;
 			Pen.line(0 @ yl, w @ yl)} ;
 		Pen.stroke ;
@@ -208,19 +208,19 @@ APScoreGui {
 			}
 		}
 	}
-	
+
 	update { arg theChanged, theChanger, more;
-		window.refresh ;
+		{window.refresh}.defer ;
 	}
 
 }
 
 APGraphGui {
-	
-	var <>graph, <>dict, <>window, <>w, <>h ;	
+
+	var <>graph, <>dict, <>window, <>w, <>h ;
 
 	*new { arg apGraph, w = 400, h = 400 ;
-		^super.new.initGraphGui (apGraph, w, h)	
+		^super.new.initGraphGui (apGraph, w, h)
 	}
 
 	initGraphGui { arg ag, ww, hh ;
@@ -229,9 +229,9 @@ APGraphGui {
 		dict = IdentityDictionary.new ;
 		graph.graphDict.keys.do{|k| dict[k] = graph.graphDict[k].add([10+(w-20).rand,10+(h-20).rand]) } ;
 		graph.addDependant(this) ;
-		
+
 		window = Window( "Alexander Process Graph", Rect( 100, 200, w, h ), resizable: false ).front;
-	window.drawHook = {
+	window.drawFunc = {
 	var x, y, xe, ye, r ;
 	Pen.font = Font( "SansSerif", 8 );
 	graph.graphDict.keys.do {|k|
@@ -240,14 +240,14 @@ APGraphGui {
 		r = Rect(x-5,y-5, 10, 10) ;
 		if (dict[k][0].state == 0) {Pen.fillColor_(Color.black)}{Pen.fillColor_(Color.red)} ;
 		Pen.fillOval(r) ;
-		Pen.fillColor_(Color.hsv(0.1, 1 ,1)) ;	
+		Pen.fillColor_(Color.hsv(0.1, 1 ,1)) ;
 		Pen.stringAtPoint(k.asString, x@y) ;
-		Pen.strokeColor_(Color.black) ;	
+		Pen.strokeColor_(Color.black) ;
 		dict[k][1].do{|end|
 			xe = dict[end][2][0] ;
 			ye = dict[end][2][1] ;
 			Pen.line(x@y, xe@ye) ;
-			Pen.stroke ;		
+			Pen.stroke ;
 				}
 			}
 		}
@@ -255,7 +255,7 @@ APGraphGui {
 	}
 
 	update { arg theChanged, theChanger, more;
-		window.refresh ;
+		{window.refresh }.defer ;
 	}
 
 
@@ -291,8 +291,8 @@ g.activateAll; g.reactivate
 
 /*
 
-g = APGraph.new(2,1) ; // always reactivate
-~num = 8 ;
+g = APGraph.new(0.2,1) ; // always reactivate
+~num = 25 ;
 ~num.do{g.addVertex(rrand(0.5, 2).round(0.1),0.5) } ; ~num.do{g.addEdge(~num.rand, ~num.rand) }
 p = APGraphGui(g, 700, 700)
 c = APScoreGui(g, 1000, 500)

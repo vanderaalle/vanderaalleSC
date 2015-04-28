@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="949.54">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px Helvetica}
+p.p5 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p6 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 12.0px Helvetica}
+p.p7 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p8 {margin: 0.0px 0.0px 0.0px 85.0px; text-indent: -85.0px; font: 12.0px Helvetica}
+p.p9 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #bc1818}
+p.p10 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #bc1818; min-height: 12.0px}
+p.p11 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco; color: #606060}
+p.p12 {margin: 0.0px 0.0px 0.0px 57.0px; text-indent: -57.0px; font: 9.0px Monaco}
+p.p13 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; color: #bf0000}
+span.s1 {font: 18.0px Helvetica}
+span.s2 {color: #0514c1}
+span.s3 {color: #000000}
+span.s4 {color: #0000bf}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head>
+<body>
+<p class="p1"><span class="s1"><b>Rduino<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b></span><b> interface to the Arduino electronics prototyping platform</b><span class="s1"><b><span class="Apple-tab-span">	</span></b></span></p>
+<p class="p2"><br></p>
+<p class="p1"><b>Inherits from: Object</b></p>
+<p class="p3"><br></p>
+<p class="p1">There are already two Quarks available to interface to the Arduino. <span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>Arduino </b>uses the SimpleMessageSystem, a text based control protocol. <span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>SCPyduino </b>uses the Firmata protocol.</p>
+<p class="p2"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b>Rduino </b>provides a direct connection to the Arduino hardware using the basic Arduino software library.</p>
+<p class="p1">This is a very simple interface that should work without modification with future versions of the Arduino</p>
+<p class="p1">hardware.<span class="Apple-converted-space">  </span>However, this means that the user must know:</p>
+<p class="p1"><span class="Apple-tab-span">	</span>1. how many pins are available</p>
+<p class="p1"><span class="Apple-tab-span">	</span>2. which pins support pulsewidth modulation</p>
+<p class="p1"><span class="Apple-tab-span">	</span>3. which pins support analog input</p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p2"><br></p>
+<p class="p1"><b>See also:</b> <a href="applewebdata://D058F60D-E268-4508-A3DF-0641219A36BD/Core/Object.html"><span class="s2">Object</span></a> [some other help files]</p>
+<p class="p2"><br></p>
+<p class="p4"><b>Creation / Class Methods</b></p>
+<p class="p5"><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>*new (aPort, aBaudrate,)</b></p>
+<p class="p7"><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Short prose description of method.</p>
+<p class="p8"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><b>aPort </b>- A SerialPort (use SerialPort.listDevices to find the right one to use).</p>
+<p class="p8"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><b>aBaudrate </b>- Default value is 115200, changing baudrate will require a change in<span class="Apple-converted-space"> </span></p>
+<p class="p8"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>the Arduino code</p>
+<p class="p6">(<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p9"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span>// inline example</p>
+<p class="p9"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>// find the correct SerialPort name with:</p>
+<p class="p9"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>SerialPort.devices;</p>
+<p class="p10"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p11"><span class="s3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>a = </span><span class="s4">Rduino</span><span class="s3">(</span>"/dev/tty.usbserial-A9007PbV"<span class="s3">, 115200);</span></p>
+<p class="p12"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>a.mode_(13, 1);</p>
+<p class="p12"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>a.bit_(13, 1);</p>
+<p class="p5"><br></p>
+<p class="p12">)</p>
+<p class="p5"><br></p>
+<p class="p6"><b>Writing Ouput</b></p>
+<p class="p7"><br></p>
+<p class="p6"><span class="Apple-tab-span">	</span>Writing output is quite straightforward.<span class="Apple-converted-space">  </span>The Arduino library automatically sets the mode</p>
+<p class="p6">of a pin when it is written to as a bit or a pulse width modulation output.</p>
+<p class="p7"><span class="Apple-tab-span">	</span></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>bit_ (pin, 1 | 0)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>sets output value of a pin high or low; automatically sets pin to output mode</p>
+<p class="p7"><b></b><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>pw_ (pin, val)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>sets pulse<b> </b>width of pin, automatically sets pin to pw modulation mode.</p>
+<p class="p6"><span class="Apple-tab-span">	</span>On the diecimila, pins 3, 4, 6, 9, 10, 11 support pulse width modulation.</p>
+<p class="p7"><b></b><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>port_ (port, val)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Writes an 8 bit port, but does not change the IO mode of its inidividual pins</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>mode_ (pin, mode)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span></b><span class="Apple-tab-span">	</span>Pin mode: 0 - input; 1 - output,<span class="Apple-converted-space">  </span>2 - pulse width modulation</p>
+<p class="p7"><span class="Apple-tab-span">	</span></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>pwClock_ (pin, power)</b></p>
+<p class="p6"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Sets the frequence of the pulse width modulation output; this is highly hardware dependent.</p>
+<p class="p6"><span class="Apple-tab-span">	</span>For the Diecimila Arduino, there are two clocks:</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>For pins 6 and 5 (OC0A and OC0B):</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCR0B = xxxxx001, frequency is 64kHz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCR0B = xxxxx010, frequency is 8 kHz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCR0B = xxxxx011, frequency is 1kHz (default)</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCR0B = xxxxx100, frequency is 250z</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCR0B = xxxxx101, frequency is 62.5 Hz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>For pins 9, 10, 11 and 3 (OC1A, OC1B, OC2A, OC2B):</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCRnB = xxxxx001, frequency is 32kHz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCRnB = xxxxx010, frequency is 4 kHz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCRnB = xxxxx011, frequency is 500Hz (default)</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCRnB = xxxxx100, frequency is 125Hz</p>
+<p class="p13"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space">  </span>TCCRnB = xxxxx101, frequency is 31.25 Hz</p>
+<p class="p7"><b></b><br></p>
+<p class="p7"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b><span class="Apple-tab-span">	</span></p>
+<p class="p6"><b>Reading Input</b></p>
+<p class="p7"><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Input from the Arduino must be explicitly requested using the methods <b>readBit(pin) </b>and<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>readAnalog(pin)</b>.<span class="Apple-converted-space">  </span>These methods request the state of individual input pins as digital (1 or 0) and</p>
+<p class="p6"><span class="Apple-tab-span">	</span>analog (10 bit) values respectively. User functions may be assigned to <b>bitCallback </b>and<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>atodCallback</b> to process input when it is received.<span class="Apple-converted-space">  </span>The results are alos stored, using the<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>pin number as an index, in the arrays <b>bits </b>and <b>atods</b>. <span class="Apple-converted-space"> </span></p>
+<p class="p7"><span class="Apple-tab-span">	</span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>(Note: bits and atods are implemented with sparse array class Order, to avoid the need for any<span class="Apple-converted-space"> </span></p>
+<p class="p6"><span class="Apple-tab-span">	</span>device specific initialization.)</p>
+<p class="p7"><span class="Apple-tab-span">	</span></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>start</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Starts input handling</p>
+<p class="p7"><span class="Apple-tab-span">	</span></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>stop</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Stops input handling</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>readBit (pin)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span></b><span class="Apple-tab-span">	</span>request pin state</p>
+<p class="p5"><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>readAnalog (pin)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>request pin state as an analog value (limited to ATOD pins)</p>
+<p class="p7"><b></b><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>bitCallback_(function)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>This function receives the number of a bit and its current state</p>
+<p class="p7"><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>atodCallback_(function)</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>This function receives the number of an ATOD and its current state</p>
+<p class="p7"><br></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>bits[index]</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Returns the current digital value of the pin or, if it has not been received, nil.</p>
+<p class="p7"><br></p>
+<p class="p6"><span class="Apple-tab-span">	</span><b>atods[index]</b></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>Returns the current analog value of the pin or, if it has not been received, nil.</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p7"><br></p>
+<p class="p7"><br></p>
+<p class="p6"><b>Internals</b></p>
+<p class="p7"><b></b><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>sp <span class="Apple-tab-span">	</span></b>an instance of SerialPort that communicates with the Arduino</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>baudrate<span class="Apple-tab-span">	</span></b>baud rate of the port, defaults to 115200</p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>port<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></b>name of the port, obtained from SerialPort.devices</p>
+<p class="p7"><b></b><br></p>
+<p class="p6"><b><span class="Apple-tab-span">	</span>receiver<span class="Apple-tab-span">	</span></b>Routine that reads input from the serial port</p>
+<p class="p7"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p7"><b><span class="Apple-tab-span">	</span></b><span class="Apple-tab-span">	</span></p>
+</body>
+</html>

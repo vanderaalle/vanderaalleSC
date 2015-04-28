@@ -2,7 +2,7 @@
 
 A Lexer for SC, returns tokenization ad an array of two lists, one including lexemes, and the other their categories
 
-24/02/13
+AV scripsit 24/02/13
 */
 
 // NOTE: Elaborate stuff into comments can break the lexer and the colorizer
@@ -26,7 +26,7 @@ SCLexer {
 		}{
 			source = aSource ;
 		} ;
-		separators =	"\n > < [ ] ( ) { } \t = + - , . : ; ! ? ^ * / & % # @"
+		separators =	"\n > < [ ] ( ) { } \t = + - , . : ; ! ? ^ * / & % # @ $"
 		.split($ ).collect{|i| i.asSymbol}++[' '] ;
 		reserved = "var arg inf nil true false pi 2pi this thisProcess thisThread thisFunction"
 		.split($ ).collect{|i| i.asSymbol} ;

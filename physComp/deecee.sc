@@ -1,23 +1,45 @@
-DeeCeeOLD {
-	
+// one synth based
+DeeCee1 {
+
 	var <>synth ;
 	var <>offset, <>arr ;
-	
-	*new { arg offset = 2 ; 
-		^super.new.initDeeCee(offset) 	
+
+	var <>serializer ; // a serial scheduler
+	var <>fifo ; // its fifo, a mere list
+	var <>evtDur ; // activation dur
+	var <>scanPeriod ; // its fifo scan rate
+	var <>dump ;
+	var <>id ; // an optional unique ID in case of various DCs
+
+	*new { arg offset = 2, id, evtDur = 0.0075, scanPeriod = 0.012 ;
+		^super.new.initDeeCee(offset, id, evtDur, scanPeriod)
 	}
 
-	initDeeCee { arg theOff ;
+	initDeeCee { arg theOff, anId, anEvtDur, aScanPeriod ;
 		offset = theOff ;
+		id = anId ;
 		arr = [] ;
+		evtDur = anEvtDur; scanPeriod = aScanPeriod ;
 		Array.series(16).do{|i|
 			var a = [] ;
 			i.asBinaryString(4).do{|j| a = a.add(j.asString.asInteger) } ;
 			arr = arr.add(a.reverse) // depends on blackbox
 		} ;
-		this.createSynth 
+		this.createSynth ;
+		// evtDur = 0.007 ; // was 0.01
+		// scanPeriod = 0.012 ; // check this against event dur! was 0.015
+		fifo = [] ; // empty
+		serializer = Task({
+			var which ;
+			inf.do{
+				which = fifo[0] ;
+				if (which.notNil) {this.event(which); fifo = fifo[1..]} ;
+				scanPeriod.wait
+			}
+		}) ;
+		dump = 15 ; // we dump to 15
 	}
-	
+
 	createSynth {
 		Server.local.waitForBoot{
 			{
@@ -25,27 +47,52 @@ DeeCeeOLD {
 			Out.ar(offset, K2A.ar([v1,v2,v3,v4]));
 			}).add ;
 			Server.local.sync ;
-			synth = Synth(\deecee, [\offset, offset])	 
+			synth = Synth(\deecee, [\offset, offset]) ;
+			Server.local.sync ;
+			this.start ; this.addEvent(dump) ; // we protect against not addressed current
 				}.fork
 		}
 	}
-	
-	select { arg which = 1;
-		synth.setn(\v1, arr[which])
-		}
-	
+
+	select { arg which = 1; synth.setn(\v1, arr[which]) }
+
+	toDump { this.select(dump) }
 	// should be a shortcut to select the reset
-	zero { this.select(0) }  	
+	//zero { this.select(0) }
+	// doesn't make sense! 0 is not a port
+
+	// this might be private
+	event { arg which = 1 ;
+		// dur: empirical minimum time
+		{
+			this.select(which);
+			evtDur.wait;
+			this.select(dump); // we dump
+		}.fork
+	}
+
+
+	addEvent { arg which; fifo = fifo.add(which).postln;
+		this.changed(this, [id, which]);
+	}
+
+	// interface to serializer
+	start { serializer.start }
+	pause { serializer.pause }
+	resume { serializer.resume }
+
 }
 
+// event based
+// THIS IS THE OLDER IMPLEMENTATION
+// UNSAFE if you use coils
+DeeCee2 {
 
-DeeCee {
-	
-	var <>synth ; 
+	var <>synth ;
 	var <>offset, <>arr ;
-	
-	*new { arg offset = 2 ; 
-		^super.new.initDeeCee(offset) 	
+
+	*new { arg offset = 2 ;
+		^super.new.initDeeCee(offset)
 	}
 
 	initDeeCee { arg theOff ;
@@ -56,9 +103,9 @@ DeeCee {
 			i.asBinaryString(4).do{|j| a = a.add(j.asString.asInteger) } ;
 			arr = arr.add(a.reverse) // depends on blackbox
 		} ;
-		this.createSynth 
+		this.createSynth
 	}
-	
+
 	createSynth {
 		Server.local.waitForBoot{
 			{
@@ -68,34 +115,47 @@ DeeCee {
 				}.fork
 		}
 	}
-	
+
 	select { arg which = 1;
 		{
-		if (synth.notNil) {synth.free} ; // prevents parallelism 
+		if (synth.notNil) {synth.free} ; // prevents parallelism
 		Server.local.sync ;
 		synth = Synth(\deecee, [\offset, offset, \v1, arr[which]])
  		}.fork;
 	}
-	
-	
+
+
 	event { arg which = 1, dur = 1 ;
 		{
 		synth = Synth(\deecee, [\offset, offset, \v1, arr[which]]);
 		dur.wait ; synth.free
 		}.fork
 	}
-	
+
+	event2 { arg which = 1, dur = 0.1, dump = 0, release = 0.001 ;
+		{
+			synth = Synth(\deecee, [\offset, offset, \v1, arr[which]]);
+			Server.local.sync ;
+			dur.wait;
+			synth.free ;
+			Server.local.sync ;
+			synth = Synth(\deecee, [\offset, offset, \v1, arr[dump]]);
+			release.wait;
+			synth.free
+ 		}.fork;
+	}
+
 	reset { if (synth.notNil) {synth.free}  }
 
-	zero { this.select(0) }  	
+	zero { this.select(0) }
 }
 
 
 /*
 
 
-x = DeeCee.new; 
-x = DeeCee.new(2+4); 
+x = DeeCee.new;
+x = DeeCee.new(2+4);
 
 x.arr[0] = [1,1,1,1]*0.1
 x.select(14)

@@ -331,19 +331,19 @@ PsPlotter {
 
 
 (
+// alternatives:
 a = Array.fill(500, {|i| rrand(-1.0, 1.0)}) ;
 a = Env.perc ;
-a = Buffer.read(s,"/musica/audioRumentario/bells/chappa1.wav")
-a = {SinOsc.ar}
+// we boot the server
+s.boot ;
 
+a = Buffer.read(s,"/musica/audioRumentario/bells/chappa1.wav") ;
+a = {SinOsc.ar} ;
 a = SoundFile("/musica/audioRumentario/bells/chappa1.wav") ;
 
-p = PsPlotter(a, "/Users/andrea/Desktop/untitled.ps", min:-2, max:2, yEvery: 0.1, xEvery: 10, xLabEvery:10, barOn:false, speckleCol:[1,0,0], curveCol:[0,0.5, 0]) ;
-
+// plotting with some options
+p = PsPlotter(a, "/Users/andrea/Desktop/untitled.pdf", min:-1, max:1, yEvery: 0.1, xEvery: 10, xLabEvery:10, barOn:false, speckleCol:[1,0,0], curveCol:[0,0.5, 0]) ;
 
 )
-
-"pstopdf /Users/andrea/Desktop/untitled.ps".unixCmd ;
-
 
 */

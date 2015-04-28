@@ -47,7 +47,7 @@ Praat {
 									{ "/tmp/"++sndName}) ;
 			this.sndFileName = sndName ;
 			this.writeSound(sndName) ;
-			this.script = format("Read from file... %\n",				 sndFileName ) ;//.basename.splitext[0]) ;
+			this.script = format("Read from file... %\n", sndFileName) ; //.basename.splitext[0]) ;
 			//String.scDir++"/sounds/praatTmp.aiff") ;
 
 
@@ -121,7 +121,7 @@ Praat {
 			timeStep = timeStep ? 0.002 ;
 			freqStep = freqStep ? 20 ;
 			windowShape = "Hanning (sine-squared)" ; // original: "Gaussian"
-			script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick
 			script = script+format("To Spectrogram... % % % % %\n", 				windowLength, maxFreq, 	timeStep, freqStep, windowShape) ;
 
 	}
@@ -139,7 +139,7 @@ Praat {
 			preEmphasis = preEmphasis ? 6.0 ;
 			garnish = garnish ? "yes" ;
 			dynamicCompression = dynamicCompression ? 0.0 ;
-			script = script+format("select Spectrogram % \n", sndFileName.basename.splitext[0]) ;
+			script = script+format("select Spectrogram %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 			script = script +format("Paint... % % % % % % % % % %\n",
 					timeRange[0], timeRange[1], freqRange[0], freqRange[1], maxDB,
 					autoscaling, dynamicRange,preEmphasis, dynamicCompression, garnish) ;
@@ -154,7 +154,8 @@ Praat {
 		fileName = fileName ? ("/tmp/praatTmp.spectrogram") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ "/tmp/"++fileName}) ;
-		script = script+format("select Spectrogram % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Spectrogram %\n", sndFileName.basename.splitext[0] ; // trick
+	) ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 
 	}
@@ -183,7 +184,7 @@ Praat {
 			verticalRange = verticalRange ? [0,0] ;
 			garnish = garnish ? "yes" ;
 			drawingMethod = drawingMethod ? "curve" ;
-			script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+			script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 			script = script +format("Draw... % % % % % %\n", timeRange[0], timeRange[1],
 						verticalRange[0], verticalRange[1], garnish, drawingMethod) ;
 
@@ -193,7 +194,7 @@ Praat {
 
 	toSpectrum { arg fast ;
 		fast = fast ? "yes" ;
-		script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("To Spectrum... %\n", fast) ;
 	}
 
@@ -207,7 +208,7 @@ Praat {
 		minimumPower = minimumPower ? 0 ;
 		maximumPower = maximumPower ? 0 ;
 		garnish = garnish ? "yes" ;
-		script = script+format("select Spectrum % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Spectrum %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Draw%... % % % % %\n", tag,
 					frequencyRange[0],  frequencyRange[1],
 					minimumPower, maximumPower, garnish) ;
@@ -222,11 +223,16 @@ Praat {
 		fileName = fileName ? (String.scDir++"/sounds/praatTmp.spectrum") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ String.scDir++"/sounds/"++fileName}) ;
-		script = script+format("select Spectrum % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Spectrum %\n", sndFileName.basename.splitext[0]) ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 
 	}
 
+	writeSpectrumList { arg fileName ;
+		fileName = fileName ? ("tmp/praatTmp.spectrumList") ;
+		script = script+format("List... no yes no no no yes
+%\n", fileName)
+	}
 
 	/////
 	toMelFilter { arg analysisWindowDuration, timeStep,
@@ -236,7 +242,7 @@ Praat {
 		positionOfFirst = positionOfFirst ? 100.0 ;
 		distanceBetween = distanceBetween ? 100.0 ;
 		maximumFrequency = maximumFrequency ? 0.0 ;
-		script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("To MelFilter... % % % % %\n",
 			analysisWindowDuration, timeStep,
 			positionOfFirst, distanceBetween, maximumFrequency ) ;
@@ -252,7 +258,7 @@ Praat {
 		timeRange = timeRange ? [0.0, 0.0] ;
 		frequencyRange = frequencyRange ? [0.0, 0.0] ;
 		amplitudeRange = amplitudeRange ? [0.0, 0.0] ;
-		script = script+format("select MelFilter % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select MelFilter %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Paint %... % % % % % %\n", type,
 					timeRange[0], timeRange[1],
 					frequencyRange[0],  frequencyRange[1],
@@ -268,7 +274,7 @@ Praat {
 		timeRange = timeRange ? [0.0, 0.0] ;
 		frequencyRange = frequencyRange ? [0.0, 0.0] ;
 		amplitudeRange = amplitudeRange ? [0.0, 0.0] ;
-		script = script+format("select MelFilter % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select MelFilter %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Draw %... % % % % % %\n", type,
 					timeRange[0], timeRange[1],
 					frequencyRange[0],  frequencyRange[1],
@@ -281,7 +287,7 @@ Praat {
 		time = time ? 0.1 ;
 		frequencyRange = frequencyRange ? [0.0, 0.0] ;
 		amplitudeRange = amplitudeRange ? [0.0, 0.0] ;
-		script = script+format("select MelFilter % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select MelFilter %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Draw spectrum (slice)... % % % % % %\n",
 					time, frequencyRange[0],  frequencyRange[1],
 					amplitudeRange[0],  amplitudeRange[1]) ;
@@ -299,7 +305,7 @@ Praat {
 		fileName = fileName ? (String.scDir++"/sounds/praatTmp.melFilter") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ String.scDir++"/sounds/"++fileName}) ;
-		script = script+format("select MelFilter % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select MelFilter %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 
 	}
@@ -312,7 +318,7 @@ Praat {
 		maxFormantFreq = maxFormantFreq ? 5500 ; //adult female
 		windowLength = windowLength ? 0.025 ;
 		preEmphasis = preEmphasis ? 50 ;
-		script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script +format("To Formant (burg)... % % % % %\n",
 					timeStep, maxFormantNumber, maxFormantFreq, windowLength, preEmphasis) ;
 
@@ -325,7 +331,7 @@ Praat {
 		maxFrequency = maxFrequency ? 5500 ;
 		dynamicRange = dynamicRange ? 30 ;
 		garnish = garnish ? "yes" ;
-		script = script+format("select Formant % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Formant %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Speckle... % % % % % %\n",
 					timeRange[0], timeRange[1], maxFrequency,
 					dynamicRange,  garnish) ;
@@ -337,7 +343,7 @@ Praat {
 		timeRange = timeRange ? [0.0, 0.0] ;
 		maxFrequency = maxFrequency ? 5500 ;
 		garnish = garnish ? "yes" ;
-		script = script+format("select Formant % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Formant %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Draw tracks... % % % % %\n",
 					timeRange[0], timeRange[1], maxFrequency, garnish) ;
 	}
@@ -349,7 +355,7 @@ Praat {
 		fileName = fileName ? (String.scDir++"/sounds/praatTmp.formant") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ String.scDir++"/sounds/"++fileName}) ;
-		script = script+format("select Formant % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Formant %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 
 	}
@@ -363,7 +369,7 @@ Praat {
 		minimumPitch = minimumPitch ? 100 ;
 		timeStep = timeStep ? 0 ;
 		subtractMean = subtractMean ? "yes" ;
-		script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script +format("To Intensity... % % % \n",
 					minimumPitch, timeStep, subtractMean) ;
 
@@ -377,7 +383,7 @@ Praat {
 		minimum = minimum ? 0.0 ;
 		maximum = maximum ? 0.0 ;
 		garnish = garnish ? "yes" ;
-		script = script+format("select Intensity % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Intensity %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script +format("Draw... % % % % % \n", timeRange[0], timeRange[1],
 					minimum, maximum, garnish) ;
 
@@ -392,7 +398,7 @@ Praat {
 		fileName = fileName ? (String.scDir++"/sounds/praatTmp.formant") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ String.scDir++"/sounds/"++fileName}) ;
-		script = script+format("select Intensity % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Intensity %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 
 	}
@@ -404,7 +410,7 @@ Praat {
 		timeStep = timeStep ? 0 ;
 		pitchFloor = pitchFloor ? 75.0 ;
 		pitchCeiling = pitchCeiling ? 500.0 ;
-		script = script+format("select Sound % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Sound %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script +format("To Pitch... % % % \n",
 				timeStep, pitchFloor, pitchCeiling) ;
 		// doesn't avoid strange jumps
@@ -421,7 +427,7 @@ Praat {
 		tag = if (log == true, {" logarithmic"}, {""}) ;
 		timeRange = timeRange ? [0,0] ;
 		garnish = garnish ? "yes" ;
-		script = script+format("select Pitch % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Pitch %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = script +format("Draw%... % % % % % \n",
 			 tag, timeRange[0], timeRange[1], frequencyRange[0], frequencyRange[1], garnish) ;
 	}
@@ -437,7 +443,7 @@ Praat {
 		fileName = fileName ? (String.scDir++"/sounds/praatTmp.pitchContour") ;
 		fileName = if ( fileName[0]==$/, {fileName},
 									{ String.scDir++"/sounds/"++fileName}) ;
-		script = script+format("select Pitch % \n", sndFileName.basename.splitext[0]) ;
+		script = script+format("select Pitch %\n", sndFileName.basename.splitext[0]) ; // trick) ;
 		script = 	script + "To Matrix\n" ;
 		script = script + format("Write to% text file... %\n", tag, fileName) ;
 	}
@@ -896,23 +902,23 @@ Transpose\n" ;
 
 */
 
-	jSpectrogram { arg stepX, stepY ;
+	plotSpectrogram { arg stepX, stepY ;
 		//var mn = t.flat.sort.reverse[0].ampdb, mx = t.flat.sort.reverse[0].ampdb, amp = (mn-mx).abs;
 		var index, window ;
 		stepX = stepX ? 3 ;
 		stepY = stepY ? stepX ;
 		// not that fast ...
-		window = JSCWindow( "Spectrogram",
+		window = Window( "Spectrogram",
 			Rect(100,100, spectrogram.size*stepX, spectrogram[0].size*stepY), resizable: false
 					);
 		window.view.background = Color.white;
-		window.drawHook = {
+		window.drawFunc = {
 			spectrogram.do({ arg y, n ;
 				y.reverse.do({ arg item, m ;
 				//var itm = (item.ampdb+mn)/amp ;
 				//JPen.color = Color.new(1.0-itm, 1.0-itm, 1.0-itm);
-				JPen.color = Color.new(1.0-item, 1.0-item, 1.0-item);
-				JPen.fillRect( Rect( n*stepX, m*stepY, stepX, stepY ));
+				Pen.color = Color.new(1.0-item, 1.0-item, 1.0-item);
+				Pen.fillRect( Rect( n*stepX, m*stepY, stepX, stepY ));
 					});
 				});
 			};
@@ -1015,4 +1021,3 @@ Transpose\n" ;
 
 
 }
-

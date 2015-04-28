@@ -11,12 +11,12 @@ Keyboarder {
 
 	*new { arg factor = 1.0, transp = 0,
 			space = true, crlf = true,
-			map, 
-			title = "Scriptorium", 
+			map,
+			title = "Scriptorium",
 			bounds = Rect(1280-640, 800-480, 640, 480),
 			background = Color(0,0,0.4),
-			stringColor = Color.white, 
-			font = SCFont.new("Futura", 30),
+			stringColor = Color.white,
+			font = Font.new("Futura", 30),
 			rec = true ;
 		^super.new.initKeyboarder([factor, transp, space, crlf, map, title, bounds, background, stringColor, font, rec])
 	}
@@ -25,7 +25,7 @@ Keyboarder {
 		// protecting against auto syntax colorize
 		Document.globalKeyDownAction_({}) ;
 		vol = 1 ;
-		#factor, transp, space, crlf, map, 
+		#factor, transp, space, crlf, map,
 			title, bounds, background, stringColor, font, rec = args ;
 		map = map ? Array.series(58) ;
 		server = Server.local ;
@@ -34,7 +34,7 @@ Keyboarder {
 				var dur ;
 				freq = freq.clip(0, 100.midicps) ;
 				dur = 3-(freq.cpsmidi*0.01) ;
-				Out.ar(out, 
+				Out.ar(out,
 				Pan2.ar(Limiter.ar(
 				FreeVerb.ar(
 RLPF.ar(
@@ -59,7 +59,7 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 
 /*
 			SynthDef(\keySquare, { arg freq, amp = 0.1, transp = 0, out = 0, width=0.5 ;
-				Out.ar(out, 
+				Out.ar(out,
 				Pan2.ar(
 				EnvGen.kr(Env.perc, doneAction:2)
 				*Pulse.ar(freq, mul:amp, width:width)),
@@ -70,20 +70,20 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 		doc = Document.new.title_(title)
 			.bounds_(bounds)
 			.background_(background)
-			.stringColor_(stringColor) 
+			.stringColor_(stringColor)
 			.font_(font)
 			.keyDownAction_({arg doc, key, modifiers, keycode;
 				var width, pitch, amp = 0.9 ;
 				keycode.postln ;
-				case 
-					{ (keycode == 32 and: {space.not}) } { amp = 0 } 
-					{ (keycode == 13 and: {crlf.not}) } { amp = 0 } 
-					{ keycode == 43 } 
+				case
+					{ (keycode == 32 and: {space.not}) } { amp = 0 }
+					{ (keycode == 13 and: {crlf.not}) } { amp = 0 }
+					{ keycode == 43 }
 						{ server.volume.volume_((server.volume.volume.postln+1).max(-90).min(0)) ;
-							vol = (vol+0.1).max(0).min(1)} 
-					{ keycode == 45 } 
+							vol = (vol+0.1).max(0).min(1)}
+					{ keycode == 45 }
 						{ server.volume.volume_((server.volume.volume-1).max(-90).min(0)) ;
-							vol = (vol-0.1).max(0).min(1) } 
+							vol = (vol-0.1).max(0).min(1) }
 
 				//"key, keycode: ".post ; [key, keycode].postln ;
 					{ (keycode >= 65 and: { keycode < 123 }) }
@@ -107,24 +107,24 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 
 	reset {
 		doc.string_("");
-		startTime = thisThread.seconds ;		
+		startTime = thisThread.seconds ;
 		log = [] ;
-	}	
+	}
 
 
-	// a routine for some start up infos in the doc 
-	presentation { arg string, presFont = Font.new("Gill Sans", 90), 
+	// a routine for some start up infos in the doc
+	presentation { arg string, presFont = Font.new("Gill Sans", 90),
 			color =  Color.new(1, 116/255,0);
 		Routine({
-			doc.stringColor_(color) 
-				.font_(presFont) 
-				.string_(string); 
+			doc.stringColor_(color)
+				.font_(presFont)
+				.string_(string);
 			100.do({ 	arg j ;
 				doc.stringColor_(color.alpha_((100-j)*0.01)) ;
 				0.05.wait ;
 			}) ;
-			doc.string_("") 
-				.stringColor_(Color.white) 
+			doc.string_("")
+				.stringColor_(Color.white)
 				.font_(font) ;
 		}).play(AppClock) ;
 		doc.front
@@ -139,14 +139,14 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 		log = [notes].addAll(log) ;
 		log.writeArchive(path)
 	}
-	
+
 	openLog { arg path = "/log.arc";
 		log = Object.readArchive(path) ;
 		notes = log[0] ;
 		log = log[1..] ;
 	}
 
-	playFromLog { 
+	playFromLog {
 		var key, time ;
 		var width, pitch, amp = 0.2 ;
 		var waitTime, actualTime, nextTime ;
@@ -157,13 +157,13 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 				nextTime = log[index+1][0] ;
 				waitTime = nextTime - actualTime ;
 				// should protect against not-Ascii
-				key = if (item[4] <= 126) { item[2] } { " " } ; 
+				key = if (item[4] <= 126) { item[2] } { " " } ;
 				doc.string_(doc.string++key) ;
-				
-				pitch = item[1] ;				
+
+				pitch = item[1] ;
 				width = 0.5/127*pitch.clip2(127) ;
 				Synth(\keySquare, [\freq, pitch.midicps, \amp, amp, \width, width]) ;
-				
+
 				waitTime.wait ;
 			})
 		}).play(AppClock) ;
