@@ -7,13 +7,13 @@ SoundProcess {
 	var <>windowsDict ; 		// here we store gui stuff, not so clean
 	var <>oscFunc ;		// the connection func
 	var <>hostname, <>port, <>netAddr ;		// where you want to *send*
-	
+
 	var <>gui ; // the gui
-	
+
 	var <>mixer, <>busArr ;
-			
+
 	*new { arg path, hostname, port  ;  // sending stuff
-		^super.new.initSoundProcessLoader(path, hostname, port) 	
+		^super.new.initSoundProcessLoader(path, hostname, port)
 	}
 
 
@@ -21,15 +21,15 @@ SoundProcess {
 	initSoundProcessLoader { arg aPath, aHostname, aPort   ;
 		path = aPath ;
 		hostname = aHostname; port = aPort ;
-		netAddr = NetAddr(hostname, port) ;  
+		netAddr = NetAddr(hostname, port) ;
 		windowsDict = Dictionary.new ;
 	}
 
 	connect {
 		oscFunc = { |msg, time, replyAddr, recvPort|
 		var block, first, processName, param, val ;
-Ê Ê Ê	//msg.postln ;
-		first = msg[0].asString ; 
+			//msg.postln ;
+		first = msg[0].asString ;
 		if(first[..3].asSymbol == '/sp_') {
 			block = first.split($_) ;
 			processName = block[1].asSymbol ;
@@ -45,39 +45,39 @@ SoundProcess {
 		busNum.do{
 			busArr = busArr.add(Bus.audio(Server.local, chans));
 		} ;
-		mixer = BusMixer(busArr, chans, out:2) 
+		mixer = BusMixer(busArr, chans, out:2)
 		// we use busArr on 2-->6
 		// and reserve 0-1 to stereo head. You have to address explicitly the channels
 		// in that case
 	}
 
 	// create the dict by reading the content of soundProcesses folder
-	// and associating the ID retrieved from each file with its contained event 
+	// and associating the ID retrieved from each file with its contained event
 	createDict {
 		var folder = path++"/soundProcesses/" ;
 		var pipe, line, name ;
-		// clean up for easy reload 
+		// clean up for easy reload
 		processDict = Dictionary.new ;
 		pipe = Pipe.new("ls -r "++folder, "r") ; // list directory contents
-		line = pipe.getLine ; Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê// get the first line
+		line = pipe.getLine ; // get the first line
 		while({line.notNil}, {
-			name = line.asSymbol ; 
+			name = line.asSymbol ;
 			if ([\doc].includes(name).not) {
 				processDict.put(name, (folder++line++"/"++line++".scd").load) ;
 				processDict[name].netAddr = netAddr ;
 				processDict[name].busArr = busArr ;
-				processDict[name].soundProcess = this ; // so we can control it from inside 
+				processDict[name].soundProcess = this ; // so we can control it from inside
 				} ;
-				line = pipe.getLine; 
+				line = pipe.getLine;
 				}); // post until l = nil
-		pipe.close; Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê // close the pipe to avoid that nasty buildup
+		pipe.close; // close the pipe to avoid that nasty buildup
 		// remove doc & sound
 //		processDict.removeAt(\doc) ;
 //		processDict.removeAt(\sound) ;
-		} 
-			
+		}
+
 	refresh { this.createDict } // easier to remember, when you have to reload stuff you call this
-	
+
 	// easy startup
 	start {
 		Server.local.waitForBoot {
@@ -91,30 +91,30 @@ SoundProcess {
 			this.createGui ; // here we create the stuff
 		}
 	}
-	
+
 	createGui {
-		gui = SoundProcessGui.new ;	
+		gui = SoundProcessGui.new ;
 	}
-	
+
 	panic {
 		{
 			Server.freeAll ;
 			Server.local.sync ;
 			Buffer.freeAll ;
 			Server.local.sync ;
-			mixer.recreateSynths ;	
+			mixer.recreateSynths ;
 			{gui.window.close ;
 			this.createGui }.defer
 		}.fork
-		
-	} 
-	
-	
+
+	}
+
+
 	// 2. CONTROL interface
-		
+
 	begin { arg processName ;
 		var log, logPath ;
-		if ( processDict[processName].notNil) 
+		if ( processDict[processName].notNil)
 			{
 		{ this.gui.makeGui(processDict[processName]) }.defer ;
 		logPath = path++"/soundProcesses/"++processName++"/"++processName++".log";
@@ -126,7 +126,7 @@ SoundProcess {
 	}
 
 	end { arg processName ;
-		processDict[processName].end 
+		processDict[processName].end
 	}
 
 	setParam { arg processName, command, value ;
@@ -134,41 +134,41 @@ SoundProcess {
 		processDict[processName].perform(cmd, value) ;
 	}
 
-	// the general method	
+	// the general method
 	set { arg processName, command, value ;
-		case 
-			{ [\begin, \end].includes(command).not } 
+		case
+			{ [\begin, \end].includes(command).not }
 				{ this.setParam(processName, command, value) }
-			{command == \begin } 
+			{command == \begin }
 				{ this.begin(processName) }
-			{command == \end } 
+			{command == \end }
 				{ this.end(processName) }
-	}	
-	
-	
+	}
+
+
 	// 3. DOCUMENTATION
-	
+
 	// Document generator
 	createDoc {
 		var folder = path++"/soundProcesses/" ;
 		var pipe, line, name ;
-		// clean up for easy reload 
+		// clean up for easy reload
 		var docDict = Dictionary.new ;
 		pipe = Pipe.new("ls -r "++folder, "r") ; // list directory contents
-		line = pipe.getLine ; Ê Ê Ê Ê Ê Ê Ê Ê Ê Ê// get the first line
+		line = pipe.getLine ; // get the first line
 		while({line.notNil}, {
 			//line.;
 			name = line.split($.)[0].asSymbol ;
 			if ([\doc].includes(name).not) {
 			docDict.put(name, (folder++line++"/"++line++".scd").load) };
-			line = pipe.getLine; 
+			line = pipe.getLine;
 			}); // post until l = nil
-		pipe.close; Ê// close the pipe to avoid that nasty buildup
+		pipe.close; // close the pipe to avoid that nasty buildup
 		// remove doc & sound
 		docDict.removeAt(\doc) ;
 		this.writeDoc(docDict) ;
-	} 
-	 
+	}
+
 	writeDoc { arg docDict ;
 		var file = File(path++"/soundProcesses/doc/soundProcessesDoc.tex", "w") ;
 		var block, head, temp ;
@@ -178,7 +178,7 @@ SoundProcess {
 		file.write(head+"\n\\type{"++Date.getDate++"}\n\\blank[3cm]\n\n\n\n") ;
 		temp.close ;
 		file.write("");
-		docDict.keys.do{|k| 
+		docDict.keys.do{|k|
 			// here we have to work
 			name = docDict[k][\nfo][\name] ;
 			desc = docDict[k][\nfo][\desc] ;
@@ -187,16 +187,16 @@ SoundProcess {
 			params = docDict[k][\nfo].keys.select{ |k|  [\name, \desc].includes(k).not} ;
 			file.write("\\startitemize\n") ;
 			params.do { |p|
-				file.write("\\item\n{\\em "+p++"}: ") ; 
+				file.write("\\item\n{\\em "+p++"}: ") ;
 				file.write(docDict[k][\nfo][p]+"\n") ;
 				docDict[k][\nfo][p] ;
 			};
-			file.write("\\stopitemize\n\\stoppacked\\blank\n") ;	
-	
+			file.write("\\stopitemize\n\\stoppacked\\blank\n") ;
+
 		} ;
 		file.write("\\stopcolumns\n\\stoptext") ;
 		file.close ;
-	} 
+	}
 
 }
 
@@ -227,16 +227,16 @@ l.end(\sinusoidalTheremin) ;
 
 
 // direct acces to dict,  you won't use it
-l.processDict[\template].testSynth ; // works 
-l.processDict[\sinusoidalTheremin].begin ; // works 
-l.processDict[\sinusoidalTheremin].end ; // works 
+l.processDict[\template].testSynth ; // works
+l.processDict[\sinusoidalTheremin].begin ; // works
+l.processDict[\sinusoidalTheremin].end ; // works
 
 */
 
 
 // GUI support
 SoundProcessGui {
-	
+
 	var <>process ;	// the process to be controlled
 	var <>controls ;
 	var <>step ;
@@ -244,9 +244,9 @@ SoundProcessGui {
 	var <>window, <>yOff, <>existing ;
 	var <>slArr, <>nbArr ;
 	var <>task, <>rate ;
-			
-	*new { arg step = 20, rate = 5 ; 
-		^super.new.initSoundProcessGui(step,rate) 	
+
+	*new { arg step = 20, rate = 5 ;
+		^super.new.initSoundProcessGui(step,rate)
 	}
 
 	initSoundProcessGui { arg aStep, aRate ;
@@ -255,21 +255,21 @@ SoundProcessGui {
 		window = Window("SoundProcess", Rect(100, 280, 500, 110)).front ;
 		window.onClose_{ task.pause } ;
 	}
-	
-	// PRIVATE 
+
+	// PRIVATE
 	createLabelView { arg name, desc ;
 		var descSize = 10 ;
 		var lineSpace = ((desc.size/20).asInteger+1)*(descSize*1.6) ;
 		StaticText(Window(name, Rect(10, 40, 300, lineSpace+10)).front, Rect(10, 10, 270, lineSpace-10))
 		.string_(desc)
-		.font_(Font("Futura", 10))	
+		.font_(Font("Futura", 10))
 	}
-	
+
 	makeGui { arg aProcess ;
 		var name, desc, descSize, lineSpace ;
-		var height ; 
+		var height ;
 		process = aProcess ;
-		
+
 		name = process[\nfo][\name].asString ;
 		desc = process[\nfo][\desc].asString ;
 		descSize = 10 ;
@@ -310,15 +310,15 @@ SoundProcessGui {
 				.mouseDownAction_{this.createLabelView(i, process[\nfo][i])} ;
 			slArr = slArr.add(Slider(window, Rect(80, j*step+50+lineSpace, 300,  step,))) ;
 			nbArr = nbArr.add(NumberBox(window, Rect(390, j*step+50+lineSpace, 50, step))) ;
-			nbArr[j].action_{|me| slArr[j].value_(me.value); 
+			nbArr[j].action_{|me| slArr[j].value_(me.value);
 				process.perform(("set_"++i).asSymbol, me.value)} ;
 			slArr[j].action_{|me| nbArr[j].value_(me.value);
 				process.perform(("set_"++i).asSymbol, me.value)} ;
-		};	
+		};
 		task.play(AppClock) ;
 	}
 
-	
+
 
 
 }

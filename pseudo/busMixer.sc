@@ -11,14 +11,14 @@ Andrea Valle, 12/06/2012, for the Pseudo project
 
 
 BusMixer {
-	
+
 	var <>busArr, <>numChan ;
 	var <>synthArr, <>mulArr ;
 	var <out, <>monoBus, <>monoSynth ;
 	var <>path ;
 	var <vol, <scale ; // scale is for scaling vol without loosing its main val
 	var <>mixGui ;
-	
+
 	*new { arg busArr, numChan = 4, out = 0, path ;  // sending stuff
 		^super.new.initBusMixer(busArr, numChan, out, path)
 		}
@@ -38,23 +38,23 @@ BusMixer {
 			}).add ;
 		monoBus = Bus.audio(Server.local, 4) ; // to mono check
 //		if (mixGui.notNil) {mixGui.window.close} ;
-		Server.local.sync ;	
+		Server.local.sync ;
 		busArr.do{|bus|
-			synthArr = synthArr.add(Synth.tail(Server.local, \synthBus, 
+			synthArr = synthArr.add(Synth.tail(Server.local, \synthBus,
 				[\bus, bus, \out, out, \mute, 1, \mul, 1, \vol, 1])) ;
 			mulArr = mulArr.add(1) ;
-		Server.local.sync ;		
+		Server.local.sync ;
 		} ;
-		Server.local.sync ;	
-		{if (mixGui.isNil) {this.gui} }.defer;		
+		Server.local.sync ;
+		{if (mixGui.isNil) {this.gui} }.defer;
 		}.fork
 	}
-	
+
 	recreateSynths {
 		{
 		synthArr = [] ;
 		busArr.do{|bus|
-		synthArr = synthArr.add(Synth.tail(Server.local, \synthBus, 
+		synthArr = synthArr.add(Synth.tail(Server.local, \synthBus,
 				[\bus, bus, \out, out, \mute, 1, \mul, 1, \vol, 1])) ;
 			mulArr = mulArr.add(1) ;
 			} ;
@@ -63,9 +63,9 @@ BusMixer {
 		{this.mixGui.newStetho}.defer ;
 		}.fork
 	}
-	
-	
-	// just to test, must be improved 
+
+
+	// just to test, must be improved
 	mono { arg out = 0 ;
 		{
 			this.out_(monoBus.index) ;
@@ -76,38 +76,38 @@ BusMixer {
 
 	vol_ { arg value ; synthArr.do{|sy| sy.set(\vol, value*scale)} ; vol = value }
 	scale_ { arg value ; synthArr.do{|sy| sy.set(\vol, vol*value)} ; scale = value }
-	
+
 	out_ { arg value ; synthArr.do{|sy| sy.set(\out, out)} ; out = value }
 
-	write { 
+	write {
 		mulArr = [vol] ;
 		synthArr.do{|sy, i|
 			sy.get(\mul, {|val| mulArr = mulArr.add(val) ;
-				mulArr.writeArchive(path) }) 
+				mulArr.writeArchive(path) })
 		};
 	}
-			
-	read { 
+
+	read {
 		if (File.exists(path)) {
 		mulArr = Object.readArchive(path) ;
-		this.vol_(mulArr[0]) ; 
+		this.vol_(mulArr[0]) ;
 		mulArr = mulArr[1..] ;
 		mulArr.do{|mul, i| synthArr[i].set(\mul, mul) } ;
 		if (mixGui.notNil) { {mixGui.refresh}.defer; "suca".postln } ;
-		} { "Log does not exist".postln } 
+		} { "Log does not exist".postln }
 	}
 
-	gui { mixGui = BusMixerGui(this) }	
-	
+	gui { mixGui = BusMixerGui(this) }
+
 }
 
 BusMixerGui {
-	
+
 	var <>busMixer, <>window, <>slArr, <>btArr, <>recButt, <>mainSl ;
 	var <>stetho, <>bck;
-	
+
 	*new { arg busMixer ;
-		^super.new.initBusMixerGui(busMixer) 	
+		^super.new.initBusMixerGui(busMixer)
 		}
 
 
@@ -117,17 +117,17 @@ BusMixerGui {
 		Button(window, Rect(10,30, 40, 30)).states_([["Record", Color.white, Color.red]])
 			.action_{ busMixer.write}.font_(Font("Futura", 10))  ;
 		StaticText(window, Rect(10, 80, 100, 30 )).string_("Bus Mixer").font_(Font("Futura", 10)) ;
-		
+
 		NumberBox(window, Rect(20, 145, 20, 20)).font_(Font("Futura", 10))
 			.action_{|me| busMixer.setOut(me.value)} ;
-		
+
 		StaticText(window, Rect(22, 160, 100, 30 )).string_("out").font_(Font("Futura", 10)) ;
 
 		Button(window, Rect(10,30+180, 40, 30)).states_([["Read", Color.red, Color.white]])
 			.action_{ busMixer.read; this.refresh}.font_(Font("Futura", 10))  ;
-		
+
 		mainSl = Slider(window, Rect(20* busMixer.busArr.size+20+50, 10, 30, 250))
-			.value_(1.ampdb.linlin(-96, 3, 0, 1)) 
+			.value_(1.ampdb.linlin(-96, 3, 0, 1))
 			.action_{|me| busMixer.vol_(me.value.linlin(0,1, -96, 3).dbamp)} ;
 		StaticText(window, Rect(20* busMixer.busArr.size+20+50, 10+250+10, 30, 15)).string_("Main").font_(Font("Futura", 10)) ;
 		busMixer.busArr.do{|b, i|
@@ -141,26 +141,26 @@ BusMixerGui {
 				.states_([["M", Color.black, Color.grey], ["",Color.white, Color.green]])
 				.action_{|me| busMixer.synthArr[i].set(\mute, me.value)}
 				)} ;
-//		window.onClose_{ 
-//			busMixer.busArr.do{|b| b.free}; 
+//		window.onClose_{
+//			busMixer.busArr.do{|b| b.free};
 //			busMixer.synthArr.do{|sy| sy.free} } ;
-		
+
 		bck = CompositeView.new(window, Rect(20* busMixer.busArr.size+20+50+50, 10, 475, 250)) ;
 		stetho = 	QStethoscope2.new(Server.local,6, index: 0, view: bck) ;
 		stetho.view.bounds_(Rect(0, 0, 450, 250))
 		//	window.onClose_{ stetho.free } ;
 		//CmdPeriod.doOnce{ window.close } ;
-		
-		
-	} 
-	
+
+
+	}
+
 	newStetho {
 		bck.remove ;
 		bck = CompositeView.new(window, Rect(20* busMixer.busArr.size+20+50+50, 10, 475, 250)) ;
 		stetho = 	QStethoscope2.new(Server.local,6, index: 0, view: bck) ;
 		stetho.view.bounds_(Rect(0, 0, 450, 250))
 	}
-	
+
 	refresh {
 		mainSl.value_(busMixer.vol.ampdb.linlin(-96, 3, 0,1) );
 		busMixer.synthArr.do{|sy, i|
@@ -174,12 +174,13 @@ BusMixerGui {
 
 s.reboot ;
 (
-b = Bus.audio(s, 4); c = Bus.audio(s, 4) ;
+b = Bus.audio(s, 4); c = Bus.audio(s, 4) ;  d = Bus.audio(s, 4) ;
 
 x = {Out.ar(b, SinOsc.ar([1000, 1500, 2000, 3000]))}.play ;
 y = {Out.ar(c, [WhiteNoise.ar, WhiteNoise.ar,WhiteNoise.ar,WhiteNoise.ar])}.play ;
+z = {Out.ar(d, [Pulse.ar, Pulse.ar,Pulse.ar,Pulse.ar])}.play ;
 
-m = BusMixer([b,c], 4, "/log") ;
+m = BusMixer([b,c,d], 2, "/log") ;
 
 m.vol_(0.1)
 m.vol
