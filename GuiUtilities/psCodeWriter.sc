@@ -139,7 +139,9 @@ PsCodeWriter {
 
 	setWidth {
 		height = if (height.isNil) {source[0].count{|i| i==$\n}+3*fontSize*inBetween}{height} ; // was 1*fontSize
-		str = str++"% document size\n";
+		str = str++"%!PS-Adobe-3.0 EPSF-3.0\n%%BoundingBox: 0 0 X Y\n% document size\n"
+		    .replace("X", width+(frame*2))
+			.replace("Y", height+(frame*2));
 		str = str++"<< /PageSize [X Y] >> setpagedevice\n"
 			.replace("X", width+(frame*2))
 			.replace("Y", height+(frame*2))
@@ -247,13 +249,17 @@ PsCodeWriter {
 	}
 
 	write {
-		var file = File(pathName++".ps", "w") ;
+		var file = File(pathName++".eps", "w") ;
 		file.write(str++"showpage\n") ;
 		file.close ;
 		if (ext.asSymbol == \pdf) {
-			("pstopdf"+pathName++".ps").unixCmd{
-				("rm"+pathName++".ps").unixCmd
-			}
+			// standard pstopdf doesn't include fonts
+			//("pstopdf"+pathName++".ps").unixCmd{
+			//			("rm"+pathName++".ps").unixCmd
+			//}
+			// provided by Volkhard: epstopdf --gsopt=-dPDFA filename.eps
+			// note that unixCmd doesn't work so luckily we got with the trick
+			("epstopdf --gsopt=-dPDFA"+pathName++".eps").runInTerminal (shell: "/bin/bash")
 		}
 	}
 
@@ -262,7 +268,7 @@ PsCodeWriter {
 
 /*
 
-u = PsCodeWriter("/Users/andrea/Desktop/test.scd", "/Users/andrea/Desktop/untitled2.pdf", height: nil).typeset.write ;
+u = PsCodeWriter("/Users/andrea/Desktop/test.scd", "/Users/andrea/Desktop/test.pdf", height: nil).typeset.write ;
 
 u = PsCodeWriter("/Users/andrea/Library/Application Support/SuperCollider/Extensions/SCClassLibrary/vanderaalleSC/rumentarium/ruEasyGui.sc", "/Users/andrea/Desktop/untitled2.pdf").typeset.write ;
 

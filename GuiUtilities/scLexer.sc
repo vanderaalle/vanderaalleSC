@@ -142,7 +142,12 @@ SCLexer {
 			{ lexeme == $\\ }
 			{ buf = lexeme ;
 				lexeme = p.next ;
-				while {lexeme.isAlphaNum} {buf = buf++lexeme; lexeme = p.next};
+				while {lexeme.isAlphaNum } {
+					buf = buf++lexeme;
+					lexeme = p.next ;
+					// awful protection against nil
+					lexeme  = if (lexeme.isNil){$ }{lexeme}
+				};
 				lexemeList = lexemeList.add(buf) ;
 				lexeme
 			}
@@ -158,7 +163,12 @@ SCLexer {
 			// issue: we don't get floats, as they depend from context (num.num)
 			{ lexeme.isAlphaNum }
 			{ buf = "" ;
-				while {lexeme.isAlphaNum} {buf = buf++lexeme; lexeme = p.next};
+				while {lexeme.isAlphaNum} {
+					buf = buf++lexeme;
+					lexeme = p.next ;
+					// awful protection against nil
+					lexeme  = if (lexeme.isNil){$ }{lexeme}
+				};
 				lexemeList = lexemeList.add(buf)
 			}
 
@@ -173,7 +183,12 @@ SCLexer {
 			{ lexeme == $_ }
 			{ buf = lexeme ;
 				lexeme = p.next ;
-				while {lexeme.isAlphaNum} {buf = buf++lexeme; lexeme = p.next};
+				while {lexeme.isAlphaNum} {
+					buf = buf++lexeme;
+					lexeme = p.next ;
+					// awful protection against nil
+					lexeme  = if (lexeme.isNil){$ }{lexeme}
+				};
 				lexemeList = lexemeList.add(buf)
 			}
 
@@ -181,7 +196,12 @@ SCLexer {
 			{ lexeme == $~ }
 			{ buf = lexeme ;
 				lexeme = p.next ;
-				while {lexeme.isAlphaNum} {buf = buf++lexeme; lexeme = p.next};
+				while {lexeme.isAlphaNum} {
+					buf = buf++lexeme;
+					lexeme = p.next ;
+					// awful protection against nil
+					lexeme  = if (lexeme.isNil){$ }{lexeme}
+				};
 				lexemeList = lexemeList.add(buf)
 			}
 
