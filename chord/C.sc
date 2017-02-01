@@ -98,7 +98,7 @@ C7b11	{0, 4, 7, 10, 17}"
 			structure.remove(4) ;
 			structure = structure.add(sus)
 		} ;
-		add = this.processAdd(symbol).postln ;
+		add = this.processAdd(symbol) ;
 		if (add.notNil) {
 			structure = structure.add(add)
 		}
@@ -124,18 +124,14 @@ C7b11	{0, 4, 7, 10, 17}"
 		if (symbol.asString.contains("add")){
 			add = symbol.asString.replace("add", "@").split($@)[1];
 			base = dict[add.replace("b", "").replace("#", "").asSymbol] ;
-			add.postln ;
 			case {add.split($b)[1].notNil}{
 				add = base-1 ;
-				"flatten".postln
 			}
 			{add.split($#)[1].notNil}{
 				add = base+1 ;
-					"sharpen".postln
 			}
 			{(add.split($#)[1].isNil) && (add.split($b)[1].isNil) }
 			{add = base;
-					"no alt".postln
 			}
 		} ;
 		^add

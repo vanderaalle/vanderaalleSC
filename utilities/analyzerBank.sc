@@ -213,7 +213,59 @@ AnalyzerBankNGui {
 
 }
 
+
+
+AnalyzerBankLogger {
+
+	var <>analyzer, <>path, <>file, <>time, <>rate ;
+	var <>keys, <>polled, <>pollTask, <>log ;
+
+	*new { arg analyzer, path, rate = 1/20 ;  // sending stuff
+		^super.new.initAnalyzerBankLogger(analyzer, path, rate)
+		}
+
+	initAnalyzerBankLogger { arg anAnalyzer, aPath, aRate ;
+		analyzer = anAnalyzer ;
+		path = aPath ;
+		file = File(path, "w") ;
+		time = thisThread.seconds ;
+		keys = analyzer.outDict.keys.asArray ;
+		polled = Array.fill(analyzer.outDict.keys.size, {0}) ; // init
+		log = [] ;
+		rate = aRate ;
+		pollTask = Task{
+			inf.do{
+				keys.do{|key, ind|
+					analyzer.outDict[key].get{|v|
+						polled[ind] = v;
+						if (ind == (analyzer.outDict.keys.size-1))
+						{ log = log.add(polled.deepCopy.postln) }
+					} ;
+					rate.wait ;
+				}
+			}
+		} ;
+	}
+
+	// task interface
+	start { pollTask.start }
+	stop { pollTask.stop }
+	reset { pollTask.reset }
+
+	close {
+		// write in an easy parsifiable ASCII format
+		file.write("[") ;
+		log.do{|i|
+			file.write(i.asCompileString++",")
+		} ;
+		file.write("]") ;
+		file.close ;
+	}
+
+
+}
 /*
+
 
 
 s.reboot ;
