@@ -1,0 +1,23 @@
+Xoán:
+
+- anRate = 1 looks buggy
+see bin navigator bar
+
+- if there's nothing a warning should be raised, as image is not compiled
+
+-
+SonaGraph.prepare;
+
+~sample = Buffer.read(s, "/Users/andrea/Downloads/denoise_mono2.wav").normalize
+
+a = SonaGraph.new
+a.analyze(~sample, 2);
+a.gui(hStep: 10);
+a.plotAvSpectrum;
+
+a.showSpectrumChord;
+a.showSpectrumChord(num: 20);
+
+// they should be the same, they are not
+a.showSonagram(-10, width: 1200, height: 900);
+a.showSonagramChord(-10, width: 1200, height: 900);
