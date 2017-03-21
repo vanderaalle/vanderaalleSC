@@ -28,9 +28,10 @@ SonaGraphGui {
 		attOn = false ;
 	}
 
-	makeGui { |thresh = -96, sfViewH = 100, labView = 20, labStep = 5|
+	makeGui { |thresh = -96, sfViewH = 100, labView = 20, labStep = 5,
+		pitchOn = true|
 		// thresh: used to select active band AND pitch
-		var flag, player ;
+		var flag, player, binBar ;
 		w = Window("SonaGraph",
 			Rect(10, 100, hStep*amp.size, vStep*amp[0].size+sfViewH+labView))
 		.background_(Color.gray)
@@ -62,11 +63,13 @@ SonaGraphGui {
 			} ;
 
 			Pen.fillColor_(Color.red) ;
-			pitch.do{|p, i|
-				if(amp[i][p-21] > thresh){
-					Pen.fillOval(Rect(i*hStep,
-						vStep*amp[0].size-((p-21)*vStep)-(vStep*0.5),
-						hStep, vStep))
+			if(pitchOn){
+				pitch.do{|p, i|
+					if(amp[i][p-21] > thresh){
+						Pen.fillOval(Rect(i*hStep,
+							vStep*amp[0].size-((p-21)*vStep)-(vStep*0.5),
+							hStep, vStep))
+					}
 				}
 			}
 		} ;
@@ -111,7 +114,7 @@ SonaGraphGui {
 			}
 		} ;
 
-		UserView.new(w, Rect(0, cursorView.bounds.height, hStep*amp.size, labView))
+		binBar = UserView.new(w, Rect(0, cursorView.bounds.height, hStep*amp.size, labView))
 		.background_(Color.grey(0.9))
 		.drawFunc_{
 			amp.size.do{|p, i|

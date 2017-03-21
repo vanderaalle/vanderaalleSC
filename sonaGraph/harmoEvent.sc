@@ -86,11 +86,19 @@ HarmoEvent {
 	// cascade calls to get filtered events, and file export
 	splitIntoFiles {| thresh = 4, binDiffSec = 0.15,
 		srcPath, splitDir, anRate,
-		attD = 0.005, relD = 0.03|
-		var snd = SoundFile.openRead(srcPath) ;
-		var arr = FloatArray.newClear(snd.numFrames) ;
-		var period = (anRate.reciprocal * Server.local.sampleRate).asInteger ;
-		var att = this.getEvents(thresh, binDiff:binDiffSec/anRate.reciprocal) ;
+		attD = 0.005, relD = 0.03, normalize = true|
+		var base = srcPath.basename.splitext[0] ;
+		var snd, att, arr, period ;
+		snd = SoundFile.openRead(srcPath) ;
+		if (normalize)
+		{ SoundFile.normalize(srcPath,
+			srcPath.splitext[0]++"Norm."++srcPath.splitext[1]);
+		snd.close ;
+		snd = SoundFile.openRead(srcPath.splitext[0]++"Norm."++srcPath.splitext[1])
+		} ;
+		arr = FloatArray.newClear(snd.numFrames) ;
+		period = (anRate.reciprocal * Server.local.sampleRate).asInteger ;
+		att = this.getEvents(thresh, binDiff:binDiffSec/anRate.reciprocal) ;
 		snd.readData(arr) ; // read into arr from file
 		att[..att.size-2].do{|which,i|
 			var f = SoundFile.new.headerFormat_("AIFF")
@@ -99,7 +107,9 @@ HarmoEvent {
 				which*period,
 				att[i+1]*period,
 				attD, relD).as(FloatArray) ;
-			f.openWrite(splitDir++i++".aiff") ;
+			f.openWrite(splitDir++
+				base++which++"-"++att[i+1]
+				++".aiff") ;
 			f.writeData(data);
 			f.close ;
 		}

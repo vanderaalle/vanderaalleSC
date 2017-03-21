@@ -116,6 +116,12 @@ SonaGraph {
 		^amp[fromBin..toBin].flop.collect{|i| i.sum/i.size}
 	}
 
+	// average dynamics
+	calculateAvDynamics {|fromBin = 0, toBin|
+		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
+		^this.calculateAvSpectrum(fromBin, toBin).sum/88
+	}
+
 	// redirect
 	plotAvSpectrum {|fromBin = 0, toBin|
 		HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
@@ -331,13 +337,13 @@ SonaGraph {
 
 
 	// GUI support
-	gui {|buffer, hStep = 2.5, vStep = 6,  labStep = 10, thresh|
+	gui {|buffer, hStep = 2.5, vStep = 6,  labStep = 10, thresh, pitchOn = true|
 		var bf = case
 		{ buffer.notNil }{ buffer}
 		{ buffer.isNil }{ buf } ;
 		thresh = if(thresh.isNil){-96}{thresh} ;
 		if (bf.isNil){"Please pass a buffer!".postln}{
-			SonaGraphGui(this, bf, hStep, vStep).makeGui(thresh,  labStep:labStep)
+			SonaGraphGui(this, bf, hStep, vStep).makeGui(thresh,  labStep:labStep, pitchOn:pitchOn)
 		}
 	}
 
