@@ -117,7 +117,7 @@ HarmoEvent {
 			this.makeFile(which, (att[i+1]-1), arr, period, path, attD, relD)
 		} ;
 		// tail
-		path = splitDir++base++att.postln.last++"-"++(amp.size-1)++".aiff" ;
+		path = splitDir++base++att.last++"-"++(amp.size-1)++".aiff" ;
 		this.makeFile(att.last, (amp.size-1).postln, arr, period, path, attD, relD)
 	}
 

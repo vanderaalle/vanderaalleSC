@@ -116,6 +116,16 @@ SonaGraph {
 		^amp[fromBin..toBin].flop.collect{|i| i.sum/i.size}
 	}
 
+	calculateMaximaSpectrumChord {|num = 4, fromBin = 0, toBin|
+		^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+		.maximaChord(num);
+	}
+
+	calculateOverSpectrumChord {|thresh = -30, fromBin = 0, toBin|
+		^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+		.overChord(thresh);
+	}
+
 	// average dynamics
 	calculateAvDynamics {|fromBin = 0, toBin|
 		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
@@ -132,6 +142,73 @@ SonaGraph {
 		HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
 		.showSpectrumChord(num) ;
 	}
+
+
+	// calculate spectral boundaries
+	// must be called before gui to show them
+	calculateAtt {|thresh = 4, binDiffSec = 0.15|
+		att = HarmoEvent.newFrom(amp)
+		.getEvents(thresh, binDiffSec/anRate.reciprocal) ;
+	}
+
+	// this calls harmoEvent.getEvents and split files
+	splitIntoFiles {|thresh = 4, binDiffSec = 0.15,
+		srcPath, splitDir, attD = 0.005, relD = 0.03|
+		HarmoEvent.newFrom(amp)
+		.splitIntoFiles(thresh, binDiffSec, srcPath, splitDir, anRate, attD, relD)
+	}
+
+
+	asDatabaseItem {|thresh = -40, num = 4, fromBin = 0, toBin|
+		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
+		^(
+			\overThresh: thresh,
+			\maxima: num,
+			\name: this.buf.path.basename.splitext[0],
+			\rangeString: fromBin.asString++"-"++toBin.asString,
+			\ext: this.buf.path.basename.splitext[1],
+			\dyn: this.calculateAvDynamics(fromBin, toBin),
+			\pitch: this.calculateAvPitch(fromBin, toBin),
+			\hasPitch: this.calculateAvHasPitch(fromBin, toBin),
+			\spectrum: this.calculateAvSpectrum(fromBin, toBin),
+			\path: this.buf.path,
+			\overChord:
+			this.calculateOverSpectrumChord(thresh,fromBin, toBin),
+			\maximaChord:
+			this.calculateMaximaSpectrumChord(num, fromBin, toBin)
+		)
+
+	}
+
+	makeDatabase {|splitThresh = 4, binDiffSec = 0.15, num = 4|
+		var db = [] ;
+		this.calculateAtt(splitThresh, binDiffSec) ;
+		att.postln[..att.size-2].do{|which,i|
+			db = db.add(
+				this.asDatabaseItem(splitThresh, num, which, att[i+1]-1)
+			)
+		} ;
+		// tail
+		db = db.add(
+			this.asDatabaseItem(splitThresh, num, att.last, amp.size-1)
+		) ;
+		^db
+	}
+
+	makeDatabaseAndSplit {|thresh = -40, num = 4,
+		binDiffSec = 0.15, splitThresh = 4,
+		srcPath, splitDir, attD = 0.005, relD = 0.03,
+		writeDb = true
+		|
+		var db = this.makeDatabase(splitThresh, binDiffSec,num) ;
+		this.splitIntoFiles(splitThresh, binDiffSec,
+			srcPath, splitDir, attD, relD) ;
+		if (writeDb){
+			db.writeArchive(
+				splitDir++srcPath.basename.splitext[0]++"Db.arc")} ;
+		^db
+	}
+
 
 	// converts the amp seq into a chord seq
 	sonoToChord {|thresh = -30, fromBin = 0, toBin|
@@ -289,18 +366,6 @@ SonaGraph {
 		m.write
 	}
 
-	// calculate spectral boundaries
-	// must be called before gui to show them
-	calculateAtt {|thresh = 4, binDiffSec = 0.15|
-		att = HarmoEvent.newFrom(amp)
-		.getEvents(thresh, binDiffSec/anRate.reciprocal) ;
-	}
-
-	splitIntoFiles {|thresh = 4, binDiffSec = 0.15,
-		srcPath, splitDir, attD = 0.005, relD = 0.03|
-		HarmoEvent.newFrom(amp)
-		.splitIntoFiles(thresh, binDiffSec, srcPath, splitDir, anRate, attD, relD)
-	}
 
 	// synthesize sonagram
 	synthesize  { arg thresh ;

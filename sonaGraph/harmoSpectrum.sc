@@ -104,7 +104,6 @@ HarmoSpectrum {
 	overChord { |thresh = -30| ^this.specOver(thresh).collect{|i| i[0]} }
 
 
-
 	// plays back the maxima chord, db weighted
 	playMaxima {|maxima, boost = 20| // lotta dbs coz typically low
 		maxima.do{|i|
