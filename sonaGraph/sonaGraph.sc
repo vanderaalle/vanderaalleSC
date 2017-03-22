@@ -434,6 +434,8 @@ a.showSonagram(-30, fromBin:45, toBin:60, width:1200, height:900)
 a.showSonagram(-35, fromBin:45, toBin:60, width:1200, height:900)
 a.showSonagramFile(-40, 45, 60, "pdf") ; // pdf rendering and display
 
+a.showSonagramChord(-30,width:1200, height:900)
+
 a.showSonagramChord(-30, fromBin:45, toBin:60, width:1200, height:900)
 a.showSonagramFile(-40, 45, 60, "pdf") ; // pdf rendering and display
 

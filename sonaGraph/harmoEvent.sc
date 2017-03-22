@@ -83,8 +83,46 @@ HarmoEvent {
 		array[startFrame..stopFrame]
 	}
 
-	// cascade calls to get filtered events, and file export
+	// used by splitIntoFiles
+	makeFile {|startPoint, stopPoint, arr, period, path, attD, relD|
+		var f = SoundFile.new.headerFormat_("AIFF")
+			.sampleFormat_("float").numChannels_(1) ;
+		var data = this.applyEnv(arr,
+				startPoint*period,
+				stopPoint*period,
+				attD, relD).as(FloatArray) ;
+			f.openWrite(path) ;
+			f.writeData(data);
+			f.close ;
+	}
+
 	splitIntoFiles {| thresh = 4, binDiffSec = 0.15,
+		srcPath, splitDir, anRate,
+		attD = 0.005, relD = 0.03, normalize = true|
+		var base = srcPath.basename.splitext[0] ;
+		var snd, att, arr, period, path ;
+		snd = SoundFile.openRead(srcPath) ;
+		if (normalize)
+		{ SoundFile.normalize(srcPath,
+			srcPath.splitext[0]++"Norm."++srcPath.splitext[1]);
+		snd.close ;
+		snd = SoundFile.openRead(srcPath.splitext[0]++"Norm."++srcPath.splitext[1])
+		} ;
+		arr = FloatArray.newClear(snd.numFrames) ;
+		period = (anRate.reciprocal * Server.local.sampleRate).asInteger ;
+		att = this.getEvents(thresh, binDiff:binDiffSec/anRate.reciprocal) ;
+		snd.readData(arr) ; // read into arr from file
+		att[..att.size-2].do{|which,i|
+			path = splitDir++base++which++"-"++(att[i+1]-1)++".aiff" ;
+			this.makeFile(which, (att[i+1]-1), arr, period, path, attD, relD)
+		} ;
+		// tail
+		path = splitDir++base++att.postln.last++"-"++(amp.size-1)++".aiff" ;
+		this.makeFile(att.last, (amp.size-1).postln, arr, period, path, attD, relD)
+	}
+
+	// cascade calls to get filtered events, and file export
+/*	splitIntoFiles {| thresh = 4, binDiffSec = 0.15,
 		srcPath, splitDir, anRate,
 		attD = 0.005, relD = 0.03, normalize = true|
 		var base = srcPath.basename.splitext[0] ;
@@ -112,8 +150,8 @@ HarmoEvent {
 				++".aiff") ;
 			f.writeData(data);
 			f.close ;
-		}
-	}
+		} ;
+	}*/
 
 }
 
