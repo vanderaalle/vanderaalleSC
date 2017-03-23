@@ -96,6 +96,8 @@ SonaGraph {
 		}.fork
 	}
 
+	playBuf {|db = 0| Synth(\player, [\buf, buf, \amp, db.dbamp]) }
+
 	// spectral slice methods are intended for short
 	// as they work by averaging data
 
@@ -339,6 +341,43 @@ SonaGraph {
 			if(vc.size>0){vDict[j] = vc}
 		} ;
 		^vDict
+	}
+
+
+	midiInit {|port, uid|
+		MIDIClient.init;
+		MIDIClient.destinations.postln ;
+	}
+
+	sendMIDIOut {|thresh = -30, fromBin = 0, toBin, port = 0, uid, chan = 0|
+		var d, sorted = () ;
+		var m = MIDIOut.new(port) ;
+		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
+		d = this.makeVoices(thresh, fromBin, toBin) ;
+		d.keys.collect{|k|
+			d[k].do{|e|
+				if(sorted[e[1]].notNil){
+					sorted[e[1]] = sorted[e[1]].add([k+21, e[2], e[0]])
+				}{ sorted[e[1]] = [[k+21, e[2], e[0]]] }
+			}
+		} ;
+		// scheduling routing
+		{
+			(sorted.keys.asArray.sort.last + 1).do{|i|
+				if(sorted.keys.asArray.includes(i)){
+					sorted[i].do{|ev|
+						{
+							m.noteOn
+							(chan, ev[0], ev[2].linlin(-96,0, 100,127));
+							(ev[1]*anRate.reciprocal).wait ;
+							m.noteOff
+							(chan, ev[0], ev[2].linlin(-96,0, 100,127));
+						}.fork
+					}
+				} ;
+				(anRate.reciprocal).wait ;
+			}
+		}.fork
 	}
 
 	// writes a midi file, can be used directly
