@@ -38,8 +38,10 @@ SonaGraph {
 				Out.ar(out, SinOsc.ar(freq, mul:amp)*EnvGen.kr(Env.perc, doneAction:2))
 			}).add ;
 
-			SynthDef(\player, {|buf, start = 0, out = 0, amp = 1 |
-				Out.ar(out, PlayBuf.ar(1, buf, startPos:start)*amp)
+			SynthDef(\player, {|buf, start = 0, out = 0, amp = 1, dur |
+				Out.ar(out, PlayBuf.ar(1, buf, startPos:start)*amp
+					*Line.kr(1,1,dur, doneAction:2)
+				)
 			}).add ;
 		} ;
 
@@ -96,7 +98,12 @@ SonaGraph {
 		}.fork
 	}
 
-	playBuf {|db = 0| Synth(\player, [\buf, buf, \amp, db.dbamp]) }
+	playBuf {|db = 0| Synth(\player, [\buf, buf, \amp, db.dbamp, \dur, buf.numFrames/Server.local.sampleRate]) }
+
+	dur { |fromBin = 0, toBin|
+		toBin = if (toBin.isNil){amp.size-1}{toBin};
+		^amp[fromBin..toBin].size*anRate.reciprocal
+	}
 
 	// spectral slice methods are intended for short
 	// as they work by averaging data
@@ -256,7 +263,7 @@ SonaGraph {
 
 	showSonagram {|thresh = -30, fromBin = 0, toBin, res = 72, width = 800, height = 600|
 		SonaGraphLily.new
-		.showSonagram(this, thresh, fromBin, toBin, res:res, width:width, height:height)
+		.showSonagram(this, thresh, fromBin, toBin, res:res, width:width, height:height, buffer:buf)
 	}
 
 	showSonagramFile {|thresh = -30, fromBin = 0, toBin, ext = "pdf"|
@@ -349,6 +356,8 @@ SonaGraph {
 		MIDIClient.destinations.postln ;
 	}
 
+	// vDict must not be empty
+	// thresh bust not be lower than -96
 	sendMIDIOut {|thresh = -30, fromBin = 0, toBin, port = 0, uid, chan = 0|
 		var d, sorted = () ;
 		var m = MIDIOut.new(port) ;

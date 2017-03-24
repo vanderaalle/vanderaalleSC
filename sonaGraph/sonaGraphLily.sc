@@ -171,18 +171,42 @@ tagline = \"\"  % removed
 
 
 	showSonagram {|sonagraph, thresh = -30, fromBin = 0, toBin, res = 72
-		width = 800, height = 600|
-		var im, w, u, b ;
+		width = 800, height = 600, buffer|
+		var im, w, u, b, x ;
 		//var width, height ;
-		toBin = if (toBin.isNil){sonagraph.amp.size-1}{toBin} ;
+		var playSonoChord, stopSonoChord, pianoRt ;
+		var boost = 0, amp = -30.dbamp ;
 
+		toBin = if (toBin.isNil){sonagraph.amp.size-1}{toBin} ;
+		// internal func usage, dirty
+		playSonoChord = { |thresh = -30, fromBin = 0, toBin|
+			if (pianoRt.notNil){pianoRt.stop} ;
+			pianoRt = {
+				var playing = [] ;
+				sonagraph.sonoToChord(thresh, fromBin,toBin).do{|chord|
+					if (chord.size>0) {
+						chord.do{|note|
+							if (playing.includes(note[0]).not){
+								Synth(\mdaPiano,
+									[\freq, note[0].midicps,
+										\mul, (note[1]+boost).dbamp]
+							) }
+						}
+					} ;
+					playing = chord.collect{|i| i[0]} ;
+					sonagraph.anRate.reciprocal.wait
+				}
+			}.fork ;
+		} ;
+
+		stopSonoChord = { if (pianoRt.notNil){pianoRt.stop} } ;
 		{
 			this.makeLily(sonagraph, thresh, fromBin, toBin, "/tmp/sonoLily.ly") ;
 			1.wait ;
 			this.renderLily(res:res) ;
 			2.wait ;
 			im = Image.new("/tmp/sonoLily.png");
-			im.interpolation = 'smooth';//.postln;
+			im.interpolation = 'smooth';
 			// a bit shaky
 			width = if (im.width>width){width}{im.width} ;
 			height = if (im.height>height){height}{im.height} ;
@@ -192,11 +216,36 @@ tagline = \"\"  % removed
 			b = Button(w, Rect(10, 10, 50, 30))
 			.font_(Font("DIN Condensed", 10))
 			.states_([["play", Color.red, Color.white],["stop", Color.white, Color.red]])
-			.action_{|me|
+				.action_{|me|
 				if(me.value==1)
-				{sonagraph.playSonoChord(thresh, fromBin, toBin)}
-				{sonagraph.stopSonoChord}
-			}
+				{
+					playSonoChord.(thresh, fromBin, toBin) ;
+					x = Synth(\player, [
+						\buf, buffer,
+						\start,
+							fromBin.linlin(0, sonagraph.amp.size,
+							0, buffer.numFrames),
+						\dur, (toBin-fromBin).linlin(0, sonagraph.amp.size,0,
+							buffer.numFrames/Server.local.sampleRate),
+						\amp, amp]) ;
+					NodeWatcher.register(x);
+				}
+				{
+					stopSonoChord.();
+					if(x.isRunning){x.free}
+					}
+			} ;
+
+			StaticText(w, Rect(10, 50, 100, 20)).string_("spec")
+			.font_("DIN Condensed", 8);
+			StaticText(w, Rect(10, 150, 100, 20)).string_("snd")
+			.font_("DIN Condensed", 8);
+			Slider(w, Rect(10, 70, 20, 80))
+			.action_{|me|
+				boost = me.value.linlin(0.0, 1, -5, 15) ;
+				amp = me.value.linlin(0.0, 1, 10, -30).dbamp ;
+				x.set(\amp, amp) ;
+			}.valueAction_(1) ;
 		}.fork(AppClock)
 	}
 
@@ -218,8 +267,6 @@ tagline = \"\"  % removed
 	splitChordStruct {|chord|
 		^[chord.select{|i| i>= 60}, chord.select{|i| i< 60}]
 	}
-
-	//~splitChordStruct.([34, 56, 78, 101])
 
 	// given amp and thresh, convert into a chord
 	collectChords {|amp, thresh|
@@ -357,26 +404,26 @@ BASS
 
 		// internal func  usage, dirty
 		playSonoChord = { |thresh = -30, fromBin = 0, toBin|
-		if (pianoRt.notNil){pianoRt.stop} ;
-		pianoRt = {
-			var playing = [] ;
-			sonagraph.sonoToChord(thresh, fromBin,toBin).do{|chord|
-				if (chord.size>0) {
-					chord.do{|note|
-						if (playing.includes(note[0]).not){
-							Synth(\mdaPiano,
-								[\freq, note[0].midicps,
-									\mul, (note[1]+boost).dbamp]
-						) }
-					}
-				} ;
-				playing = chord.collect{|i| i[0]} ;
-				sonagraph.anRate.reciprocal.wait
-			}
-		}.fork ;
+			if (pianoRt.notNil){pianoRt.stop} ;
+			pianoRt = {
+				var playing = [] ;
+				sonagraph.sonoToChord(thresh, fromBin,toBin).do{|chord|
+					if (chord.size>0) {
+						chord.do{|note|
+							if (playing.includes(note[0]).not){
+								Synth(\mdaPiano,
+									[\freq, note[0].midicps,
+										\mul, (note[1]+boost).dbamp]
+							) }
+						}
+					} ;
+					playing = chord.collect{|i| i[0]} ;
+					sonagraph.anRate.reciprocal.wait
+				}
+			}.fork ;
 		} ;
 
-	stopSonoChord = { if (pianoRt.notNil){pianoRt.stop} } ;
+		stopSonoChord = { if (pianoRt.notNil){pianoRt.stop} } ;
 
 		{
 			this.makeLilyChord(sonagraph, thresh, fromBin, toBin, "/tmp/sonoChordLily.ly") ;
@@ -398,11 +445,20 @@ BASS
 				if(me.value==1)
 				{
 					playSonoChord.(thresh, fromBin, toBin) ;
-					x = Synth(\player, [\buf, buffer, \start,
+					x = Synth(\player, [
+						\buf, buffer,
+						\start,
 							fromBin.linlin(0, sonagraph.amp.size,
-							0, buffer.numFrames), \amp, amp.postln])
+							0, buffer.numFrames),
+						\dur, (toBin-fromBin).linlin(0, sonagraph.amp.size,0,
+							buffer.numFrames/Server.local.sampleRate),
+						\amp, amp]) ;
+					NodeWatcher.register(x);
 				}
-				{stopSonoChord.(); x.free}
+				{
+					stopSonoChord.();
+					if(x.isRunning){x.free}
+					}
 			} ;
 			StaticText(w, Rect(10, 50, 100, 20)).string_("spec")
 			.font_("DIN Condensed", 8);
