@@ -106,7 +106,11 @@ SonaGraphGui {
 				flag = false ;
 				player = Synth(\player, [\buf, buffer,
 					\start, cursor[0]
-					.linlin(0, cursorView.bounds.width, 0, sf.numFrames)])
+					.linlin(0, cursorView.bounds.width, 0, sf.numFrames),
+					\dur, buffer.numFrames -
+					cursor[0]
+					.linlin(0, cursorView.bounds.width, 0, sf.numFrames)
+				])
 			}
 			{
 				flag = true;
