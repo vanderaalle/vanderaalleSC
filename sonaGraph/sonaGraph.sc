@@ -43,19 +43,33 @@ SonaGraph {
 					*Line.kr(1,1,dur, doneAction:2)
 				)
 			}).add ;
+
+			SynthDef(\playerEv, {|buf, startFrame = 0, dur,
+				out = 0, amp = 1,
+				attD = 0.005, relD = 0.03|
+				var sus ;
+				sus = dur-attD-relD ;
+				Out.ar(out, PlayBuf.ar(1, buf, startPos:startFrame)*amp
+					*EnvGen.kr(
+					Env.new([0,1,1,0], [attD, sus, relD], [-3,\linear,3]),
+						doneAction:2)
+				)
+			}).add ;
+
+			SynthDef(\mdaPiano, { |out=0, freq=440, gate=1,
+				vel = 100, decay  = 0.5, thresh = 0.01, mul = 0.1|
+				var son = MdaPiano.ar(freq, gate, vel, decay,
+					release: 0.5, stereo: 0.3, sustain: 0);
+				DetectSilence.ar(son, thresh, doneAction:2);
+				Out.ar(out, son * mul);
+			}).add ;
+
+			SynthDef(\sinePlay, { arg freq, amp;
+				Out.ar(0, SinOsc.ar(freq, mul:amp))
+			}).add ;
+
+
 		} ;
-
-		SynthDef(\mdaPiano, { |out=0, freq=440, gate=1,
-			vel = 100, decay  = 0.5, thresh = 0.01, mul = 0.1|
-			var son = MdaPiano.ar(freq, gate, vel, decay,
-				release: 0.5, stereo: 0.3, sustain: 0);
-			DetectSilence.ar(son, thresh, doneAction:2);
-			Out.ar(out, son * mul);
-		}).add ;
-
-		SynthDef(\sinePlay, { arg freq, amp;
-			Out.ar(0, SinOsc.ar(freq, mul:amp))
-		}).add ;
 	}
 
 	analyze { |buffer, rate = 10, rq = 0.01|
@@ -98,12 +112,18 @@ SonaGraph {
 		}.fork
 	}
 
-	playBuf {|db = 0| Synth(\player, [\buf, buf, \amp, db.dbamp, \dur, buf.numFrames/Server.local.sampleRate]) }
+	playBuf {|db = 0| Synth(\player,
+		[\buf, buf, \amp, db.dbamp,
+			\dur, buf.numFrames/Server.local.sampleRate])
+	}
 
 	dur { |fromBin = 0, toBin|
 		toBin = if (toBin.isNil){amp.size-1}{toBin};
 		^amp[fromBin..toBin].size*anRate.reciprocal
 	}
+
+	// 1 bin = 16th
+	calculateTempo { ^60/(anRate.reciprocal*4) }
 
 	// spectral slice methods are intended for short
 	// as they work by averaging data
@@ -125,14 +145,29 @@ SonaGraph {
 		^amp[fromBin..toBin].flop.collect{|i| i.sum/i.size}
 	}
 
-	calculateMaximaSpectrumChord {|num = 4, fromBin = 0, toBin|
-		^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
-		.maximaChord(num);
+	calculateMaximaSpectrumChord {|num = 4, fromBin = 0, toBin,
+		withAmp = false|
+		if(withAmp){
+			^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+			.specMaxima(num)
+		}{
+			^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+			.maximaChord(num)}
 	}
 
-	calculateOverSpectrumChord {|thresh = -30, fromBin = 0, toBin|
+	/*calculateMaximaSpectrumChord {|num = 4, fromBin = 0, toBin|
+	^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+	.maximaChord(num);
+	}*/
+
+	calculateOverSpectrumChord {|thresh = -30, fromBin = 0, toBin,
+		withAmp = false|
+		if(withAmp){
 		^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
-		.overChord(thresh);
+			.specOver(thresh)}{
+		^HarmoSpectrum.newFrom(this.calculateAvSpectrum(fromBin,toBin))
+			.overChord(thresh)
+		}
 	}
 
 	// average dynamics
@@ -168,12 +203,21 @@ SonaGraph {
 	}
 
 
-	asDatabaseItem {|thresh = -40, num = 4, fromBin = 0, toBin|
+	asDatabaseItem {|thresh = -40, num = 4, fromBin = 0, toBin, id = 0|
 		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
 		^(
+			\id:id,
 			\overThresh: thresh,
 			\maxima: num,
 			\name: this.buf.path.basename.splitext[0],
+			\fromBin: fromBin,
+			\toBin: toBin,
+			\durBin: toBin-fromBin,
+			\dur: (toBin-fromBin)*anRate.reciprocal,
+			\startFrame:
+		(fromBin*anRate.reciprocal*Server.local.sampleRate).trunc.asInteger,
+			\stopFrame:
+			(toBin*anRate.reciprocal*Server.local.sampleRate).trunc.asInteger,
 			\rangeString: fromBin.asString++"-"++toBin.asString,
 			\ext: this.buf.path.basename.splitext[1],
 			\dyn: this.calculateAvDynamics(fromBin, toBin),
@@ -192,16 +236,24 @@ SonaGraph {
 	makeDatabase {|splitThresh = 4, binDiffSec = 0.15, num = 4|
 		var db = [] ;
 		this.calculateAtt(splitThresh, binDiffSec) ;
-		att.postln[..att.size-2].do{|which,i|
+		att[..att.size-2].do{|which,i|
 			db = db.add(
-				this.asDatabaseItem(splitThresh, num, which, att[i+1]-1)
+				this.asDatabaseItem(splitThresh, num, which, att[i+1]-1, i)
 			)
 		} ;
 		// tail
 		db = db.add(
-			this.asDatabaseItem(splitThresh, num, att.last, amp.size-1)
+			this.asDatabaseItem(splitThresh, num, att.last, amp.size-1, att.size-1)
 		) ;
 		^db
+	}
+
+	playEvent{|ev, amp = 1, out = 0, attD = 0.005, relD = 0.03|
+		Synth(\playerEv, [\buf, buf,
+			\startFrame, ev[\startFrame],
+			\dur, ev[\dur],
+		\attD, attD, \relD, relD, \amp, amp, \out, out
+		])
 	}
 
 	makeDatabaseAndSplit {|thresh = -40, num = 4,
@@ -268,7 +320,7 @@ SonaGraph {
 
 	showSonagramFile {|thresh = -30, fromBin = 0, toBin, ext = "pdf"|
 		{SonaGraphLily.new
-		.makeSonagram(this, thresh, fromBin, toBin, ext) ;
+			.makeSonagram(this, thresh, fromBin, toBin, ext) ;
 			3.wait ;
 			("open /tmp/sonoLily."++ext).unixCmd }.fork
 	}
@@ -285,7 +337,7 @@ SonaGraph {
 
 	showSonagramChordFile {|thresh = -30, fromBin = 0, toBin, ext = "pdf"|
 		{SonaGraphLily.new
-		.makeSonagramChord(this, thresh, fromBin, toBin, ext) ;
+			.makeSonagramChord(this, thresh, fromBin, toBin, ext) ;
 			3.wait ;
 			("open /tmp/sonoChordLily."++ext).unixCmd }.fork
 	}
@@ -356,9 +408,7 @@ SonaGraph {
 		MIDIClient.destinations.postln ;
 	}
 
-	// vDict must not be empty
-	// thresh bust not be lower than -96
-	sendMIDIOut {|thresh = -30, fromBin = 0, toBin, port = 0, uid, chan = 0|
+	sendMIDISonagram {|thresh = -30, fromBin = 0, toBin, port = 0, uid, chan = 0, timeMul = 1|
 		var d, sorted = () ;
 		var m = MIDIOut.new(port) ;
 		toBin = if (toBin.isNil){amp.size-1}{toBin} ;
@@ -370,7 +420,8 @@ SonaGraph {
 				}{ sorted[e[1]] = [[k+21, e[2], e[0]]] }
 			}
 		} ;
-		// scheduling routing
+		// scheduling routing, only if d is not empty
+		if (d.size>0){
 		{
 			(sorted.keys.asArray.sort.last + 1).do{|i|
 				if(sorted.keys.asArray.includes(i)){
@@ -378,15 +429,16 @@ SonaGraph {
 						{
 							m.noteOn
 							(chan, ev[0], ev[2].linlin(-96,0, 100,127));
-							(ev[1]*anRate.reciprocal).wait ;
+							(ev[1]*anRate.reciprocal*timeMul).wait ;
 							m.noteOff
 							(chan, ev[0], ev[2].linlin(-96,0, 100,127));
 						}.fork
 					}
 				} ;
-				(anRate.reciprocal).wait ;
+				(anRate.reciprocal*timeMul).wait ;
 			}
 		}.fork
+		}
 	}
 
 	// writes a midi file, can be used directly
@@ -414,6 +466,25 @@ SonaGraph {
 		m.write
 	}
 
+	sendMIDISpectrumMaxima {|num = 4, binDur = 1, fromBin = 0, toBin, port = 0, uid, chan = 0, timeMul = 1|
+		var m = MIDIOut.new(port) ;
+		var spec = this.calculateMaximaSpectrumChord(num, fromBin, toBin, withAmp:true) ;
+		{
+			spec.do{|ev| m.noteOn(chan, ev[0], ev[1].linlin(-96,0, 100,127))} ;
+			(binDur*anRate.reciprocal*timeMul).wait ;
+			spec.do{|ev| m.noteOff(chan, ev[0], ev[1].linlin(-96,0, 100,127))} ;
+		}.fork
+	}
+
+	sendMIDISpectrumOver {|thresh = -30, binDur = 1, fromBin = 0, toBin, port = 0, uid, chan = 0,timeMul = 1|
+		var m = MIDIOut.new(port) ;
+		var spec = this.calculateOverSpectrumChord(thresh, fromBin, toBin, withAmp:true) ;
+		{
+			spec.do{|ev| m.noteOn(chan, ev[0], ev[1].linlin(-96,0, 100,127))} ;
+			(binDur*anRate.reciprocal*timeMul).wait ;
+			spec.do{|ev| m.noteOff(chan, ev[0], ev[1].linlin(-96,0, 100,127))} ;
+		}.fork
+	}
 
 	// synthesize sonagram
 	synthesize  { arg thresh ;

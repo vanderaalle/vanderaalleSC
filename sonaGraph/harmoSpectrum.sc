@@ -71,7 +71,6 @@ HarmoSpectrum {
 	specMaxima { |num = 4|
 		var amps  ;
 		var maxima = [] ;
-		//if (spectrum.isNil){ this.calculateSpectrum } ;
 		// we do a copy because of sort
 		amps = spectrum.collect{|i| i};
 		amps = amps.sort.reverse[..(num-1)] ;
