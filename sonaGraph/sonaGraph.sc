@@ -15,7 +15,7 @@ SonaGraph {
 	var <>att ;
 
 	*prepare {
-
+		// requires mdaPiano and Tartini Ugens
 		Server.local.waitForBoot{
 			SynthDef(\pitch, { arg in, out, freq = 10 ;
 				var pt, hpt;
