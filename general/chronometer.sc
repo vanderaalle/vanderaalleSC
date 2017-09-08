@@ -14,13 +14,13 @@ Chronometer {
 		title = aTitle ;
 		quant = aQuant ;
 		startTime = thisThread.seconds ;
-		window = aWindow ;
-		this.createGUI(x, y, title, quant, window) ;
+		this.createGUI(x, y, title, quant, aWindow) ;
 	}
 
-	createGUI { arg x = 10, y = 120, title = "Tempus fugit", quant = 1, window ;
-		if (window.isNil){
-			window = Window.new(title, Rect(x, y, 200, 60)) } ;
+	createGUI { arg x = 10, y = 120, title = "Tempus fugit", quant = 1, win ;
+		if (win.isNil){
+			window = Window.new(title, Rect(x, y, 200, 60)) }
+		{ window = win} ;
 		clockField = StaticText.new(window, Rect(5,5, 190, 30))
 			.align_(\center)
 			.stringColor_(Color(1.0, 0.0, 0.0))
