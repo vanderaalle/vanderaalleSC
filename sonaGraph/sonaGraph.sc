@@ -286,6 +286,13 @@ SonaGraph {
 		}
 	}
 
+	// converts the amp seq into a chord seq, only pitch classes
+	sonoToChordClass {|thresh = -30, fromBin = 0, toBin, transp = 60|
+		^this.sonoToChord(thresh, fromBin, toBin)
+		.collect{|i|
+			i.collect{|j| [(j[0]%12)+transp, j[1]]}
+		}
+	}
 
 	// plays it back immediately
 	// if a note is present in the previous block
