@@ -6,7 +6,7 @@ An analysis utility class
 
 
 s.boot ;
-u = Bus.audio(Server.local) ; 
+u = Bus.audio(Server.local) ;
 x = { Out.ar(u, SoundIn.ar(0))}.play ;
 a = Analyzer(u) ;
 
@@ -20,10 +20,10 @@ Do we need a GUI?
 
 Analyzer {
 
-	var <>inBus, <>sig ; 
-	var <>pitch, <>onsets, <>detectSilence, <>amplitude, <>amplitudeCont, <>loudness ; 
+	var <>inBus, <>sig ;
+	var <>pitch, <>onsets, <>detectSilence, <>amplitude, <>amplitudeCont, <>loudness ;
 	var <>centroid, <>flatness ;
-	var <>pitchCont, <>centroidCont, <>loudnessCont ; 
+	var <>pitchCont, <>centroidCont, <>loudnessCont ;
 	var resp ;
 
 	*new { arg inBus ;
@@ -33,7 +33,7 @@ Analyzer {
 
 	initAnalyzer { arg anIn ;
 		inBus = anIn ;
-	
+
 // TODO: better quantize data, otherwise they always change
 	// her we probably need syncing
 		// Pitch and HasPitch
@@ -45,29 +45,29 @@ Analyzer {
 			SendTrig.kr( HPZ1.kr(pt.cpsmidi.round(roundFact)).abs,  100, pt) ;
 			SendTrig.kr( HPZ1.kr(hpt.round).abs,  101, hpt) ;
 		}).add;
-		
+
 		SynthDef(\pitchDetCont, { arg rate = 5 ; // continuous
 			var pt, hpt;
 			#pt, hpt = Tartini.kr(In.ar(inBus)) ;
 			SendTrig.kr( LFPulse.kr(rate),  102, pt) ;
-			SendTrig.kr( LFPulse.kr(rate),  103, hpt) ; 
+			SendTrig.kr( LFPulse.kr(rate),  103, hpt) ;
 		}).add;
-				
+
 		// Amplitude
-		SynthDef(\ampDet, { 
+		SynthDef(\ampDet, {
 			var amp = Amplitude.kr(In.ar(inBus));
 			SendTrig.kr( HPZ1.kr(amp).abs,  200, amp) ;
 		}).add;
 		SynthDef(\ampDetCont, { arg rate = 5 ; // continuous
 			var amp = Amplitude.kr(In.ar(inBus));
 			SendTrig.kr( LFPulse.kr(rate),  200, amp) ;
-		}).add;				
+		}).add;
 
 		// Loudness
-		SynthDef(\loud, {  
+		SynthDef(\loud, {
 			var loc = LocalBuf(1024, 1) ;
 			var sones, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
+			chain = FFT(loc, input) ;
 			sones = Loudness.kr(chain) ;
 			SendTrig.kr( HPZ1.kr(sones).abs,  300, sones) ;
 		}).add ;
@@ -75,36 +75,36 @@ Analyzer {
 		SynthDef(\loudCont, {  arg rate = 5 ; // continuous
 			var loc = LocalBuf(1024, 1) ;
 			var sones, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
+			chain = FFT(loc, input) ;
 			sones = Loudness.kr(chain) ;
 			SendTrig.kr( LFPulse.kr(rate),  301, sones) ;
 		}).add ;
 
 		// SpecCentroid --> brightness
 		SynthDef(\centrDet, { arg roundScale = 0.001 ;
-			var loc = LocalBuf(2048, 1) ; 
+			var loc = LocalBuf(2048, 1) ;
 			var centre, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
+			chain = FFT(loc, input) ;
 			centre = SpecCentroid.kr(chain) ;
 			SendTrig.kr( HPZ1.kr((centre*roundScale).round).abs,  400, centre) ;
 		}).add ;
 		// SpecCentroid --> brightness, continuous
 		SynthDef(\centrDetCont, { arg rate = 5 ;
-			var loc = LocalBuf(2048, 1) ; 
+			var loc = LocalBuf(2048, 1) ;
 			var centre, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
+			chain = FFT(loc, input) ;
 			centre = SpecCentroid.kr(chain) ;
 			SendTrig.kr( LFPulse.kr(rate),  401, centre) ;
 		}).add ;
-		
+
 		// SpecFlatness
-		SynthDef(\flatDet, {  
+		SynthDef(\flatDet, {
 			var loc = LocalBuf(2048, 1) ;
 			var flat, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
+			chain = FFT(loc, input) ;
 			flat = SpecFlatness.kr(chain) ;
 			// see help
-			flat = LinLin.kr(10 * flat.log;, -45, -1.6, 0, 1).max(-10) ; 
+			flat = LinLin.kr(10 * flat.log;, -45, -1.6, 0, 1).max(-10) ;
 			SendTrig.kr( HPZ1.kr(flat).abs,  500, flat) ;
 		}).add ;
 
@@ -112,22 +112,22 @@ Analyzer {
 		SynthDef(\onsets, { arg thresh = 0.25 ;
 			var loc = LocalBuf(512, 1) ;
 			var onsets, chain, input = In.ar(inBus) ;
-			chain = FFT(loc, input) ;	
-			onsets = Onsets.kr(chain, thresh) ; 
+			chain = FFT(loc, input) ;
+			onsets = Onsets.kr(chain, thresh) ;
 			SendTrig.kr(onsets, 600, 0) ;
 		}).add ;
-		
+
 		// Silence
 		SynthDef(\silence, { arg thresh = 0.005;
 			// thresh was: 0.005
 			SendTrig.kr(A2K.kr(DetectSilence.ar(In.ar(inBus), thresh, 0.001)), 601, 0) ;
  		}).add ;
-		Server.local.sync(c) ;		
+		Server.local.sync(c) ;
 		// paused synths
 		pitch = Synth.newPaused(\pitchDet, addAction: \addToTail) ;
 		pitchCont = Synth.newPaused(\pitchDetCont, addAction: \addToTail) ;
-		amplitude = Synth.newPaused(\ampDet, addAction: \addToTail) ; 
-		amplitudeCont = Synth.newPaused(\ampDetCont, addAction: \addToTail) ; 
+		amplitude = Synth.newPaused(\ampDet, addAction: \addToTail) ;
+		amplitudeCont = Synth.newPaused(\ampDetCont, addAction: \addToTail) ;
 		loudness = Synth.newPaused(\loud, addAction: \addToTail) ;
 		loudnessCont = Synth.newPaused(\loudCont, addAction: \addToTail) ;
 		centroid = Synth.newPaused(\centrDet, addAction: \addToTail) ;
@@ -135,46 +135,47 @@ Analyzer {
 		flatness = Synth.newPaused(\flatDet, addAction: \addToTail) ;
 		onsets = Synth.newPaused(\onsets, addAction: \addToTail) ;
 		detectSilence = Synth.newPaused(\silence, addAction: \addToTail) ;//		// creating the CC
-		this.createResponder 
+		this.createResponder
 		}
 	}
 
 	createResponder {
-		resp = OSCresponderNode(Server.local.addr,'/tr',{ arg time,responder,msg;
-			case 
-				{ msg[2] == 100 } 
+		resp = OSCFunc({ arg msg, time,addr, recvPort;
+			case
+				{ msg[2] == 100 }
 					{ this.changed(this, [\pitch, msg[3]]) }
-				{ msg[2] == 101 } 
+				{ msg[2] == 101 }
 					{ this.changed(this, [\hasPitch, msg[3]]) }
 				// the same. Discrimination depends on running synth
-				{ msg[2] == 102 } 
+				{ msg[2] == 102 }
 					{ this.changed(this, [\pitch, msg[3]]) }
-				{ msg[2] == 103 } 
+				{ msg[2] == 103 }
 					{ this.changed(this, [\hasPitch, msg[3]]) }
-				{ msg[2] == 200 } 
+				{ msg[2] == 200 }
 					{ this.changed(this, [\amplitude, msg[3]]) }
-				{ msg[2] == 300 } 
+				{ msg[2] == 300 }
 					{ this.changed(this, [\loudness, msg[3]]) }
-				{ msg[2] == 301 } 
+				{ msg[2] == 301 }
 					{ this.changed(this, [\loudness, msg[3]]) }
-				{ msg[2] == 400 } 
+				{ msg[2] == 400 }
 					{ this.changed(this, [\centroid, msg[3]]) }
-				{ msg[2] == 401 } 
+				{ msg[2] == 401 }
 					{ this.changed(this, [\centroid, msg[3]]) }
-				{ msg[2] == 500 } 
+				{ msg[2] == 500 }
 					{ this.changed(this, [\flatness, msg[3]]) }
-				{ msg[2] == 600 } 
+				{ msg[2] == 600 }
 					{ this.changed(this, [\onset]) }
-				{ msg[2] == 601 } 
+				{ msg[2] == 601 }
 					{ this.changed(this, [\silence]) }
-					
-		}).add;
+
+		}, '/tr', Server.local.addr);
 	}
 
+	// now useless, CMD+.
 	removeResponder {
 		resp.remove
 		}
-	
+
 	// remove responders?
 
 }

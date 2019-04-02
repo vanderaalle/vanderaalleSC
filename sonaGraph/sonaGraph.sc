@@ -94,6 +94,8 @@ SonaGraph {
 				if(i.includes(-inf)){
 					i = Array.fill(88, {-96})}{i}
 			} ;
+			// if you get strange values
+			amp = amp.collect{|p| p.collect{|j| if(j < 96.neg){-96}{j}}} ;
 			// flat and remove strange values
 			pitch = pitch.flat.postln.collect{|i|
 				case {i < 21} {i = 21 }

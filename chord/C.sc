@@ -51,11 +51,7 @@ Cm6 Cminmaj6	{0,3,7,9}
 C7#9	{0, 4, 7, 10, 15}
 C7b9	{0, 4, 7, 10, 13}
 C7#11	{0, 4, 7, 10, 19}
-C7b11	{0, 4, 7, 10, 17}
-Csus4	{0, 5, 7}
-Csus2	{0, 2, 7}
-Cadd2	{0, 2, 4, 7}
-Cadd2	{0, 2, 4, 7}"
+C7b11	{0, 4, 7, 10, 17}"
 		.split($\n)
 		.collect{|i| i.split($\t)}.collect{|i|
 			[
@@ -141,7 +137,7 @@ Cadd2	{0, 2, 4, 7}"
 		^add
 	}
 
-	// c = C('CMadd9') ; // c.structure
+	// c = C('CMadd2') ; // c.structure
 
 	getRoot  { arg symbol ;
 		var chr, act, root, rootName, alt ;
@@ -155,9 +151,13 @@ Cadd2	{0, 2, 4, 7}"
 		^[root, name.asSymbol] ;
 	}
 
-	play {|vol = -9|
-		(transp+structure+root).do{|i|
-			Synth(\piano,  [\note, i, \vol, vol, \decay, decay, \release, release])
+	play {|vol = -9, ground = -12|
+		(transp+structure+root).do{|i,j|
+			if(j==0){
+				Synth(\piano,  [\note, i-12, \vol, vol, \decay, decay, \release, release])
+			}{
+						Synth(\piano,  [\note, i, \vol, vol, \decay, decay, \release, release])
+			}
 		}
 
 	}
@@ -168,6 +168,7 @@ Cadd2	{0, 2, 4, 7}"
 // c = C(\C7add13).play ; c.structure.postln
 // c.root
 // C('Gbmaj9').play
+// C('FMsus4').play
 /*
 {
 "Eb7 Dm7 Eb7 Dm7 Eb7 Dm7 Em7b5 A7b5 Dm7".split($ ).collect{|i|

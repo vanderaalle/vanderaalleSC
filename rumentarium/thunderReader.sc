@@ -2,11 +2,11 @@
 // Modelled after BrailleScheduler but quite specific
 // it handles a RuMaster to which it sends msgs
 // more here the char has a dur. Each char triggers a dur
-// after the dur has passed, a zero msg is sent to the id (see convert) 
+// after the dur has passed, a zero msg is sent to the id (see convert)
 
 
 ThunderReader {
-	
+
 	// on init:
 	// - needs a text
 	// - defines a scanning interval
@@ -25,17 +25,17 @@ ThunderReader {
 	var <>inText; // the text to be parsed
 	var <>task ; // the scheduling task
 
-		
+
 	// constructor: you can start with an existing graphDict
-	*new { arg ruMaster ; 
-		^super.new.initThunderReader(ruMaster) 
+	*new { arg ruMaster ;
+		^super.new.initThunderReader(ruMaster)
 	}
 
 	initThunderReader { arg aRuMaster ;
 		ruMaster = aRuMaster ;
-		// the only dubbed one is z, mapped onto x 
+		// the only dubbed one is z, mapped onto x
 		// hapax: z, j, x
-		dict  = ( 
+		dict  = (
 			\a: 1,
 			\b: 2,
 			\c: 3,
@@ -60,8 +60,8 @@ ThunderReader {
 			\w: 22,
 			\x: 23,
 			\y: 24,
-			\z: 24 
-		) ;	
+			\z: 24
+		) ;
 		task = Task({
 				"START!".postln ;
 				offset.wait ;
@@ -71,11 +71,11 @@ ThunderReader {
 					// general case: if is a letter, convert
 					if ( stringChar.isAlpha )
 						{ 	this.convert(stringChar) ;
-							scanInterval.wait 
-						} 
-						{ (scanInterval*spaceFactor).wait 
+							scanInterval.wait
+						}
+						{ (scanInterval*spaceFactor).wait
 						};
-							
+
 					})
 				} ;
 				"DONE!".postln ;
@@ -83,12 +83,12 @@ ThunderReader {
 		}
 
 	convert { arg alphaChar ;
-		var id = dict[alphaChar.asSymbol] ;	
+		var id = dict[alphaChar.asSymbol] ;
 		{ ruMaster.setByID(id, amp); duration.wait ; ruMaster.setByID(id, 0)}.fork
 	}
-	
 
-	inspect { arg string; 
+
+	inspect { arg string;
 		var names = (
 		1: \vibragomma,
 		2: \vibraferro,
@@ -109,13 +109,13 @@ ThunderReader {
 		17: \mais,
 		18: \tuboviola,
 		19: \boccia,
-		20 : \sferamagica,
+		20: \sferamagica,
 		21: \campanahi,
 		22: \campanalo,
 		23: \tubopiccolo,
 		24: \tubogrande
 		) ;
-		
+
 		string.do{|l| names[dict[l.asSymbol]].postln}
 	}
 
@@ -154,10 +154,10 @@ ThunderReader {
 
 
 ThunderInspector {
-	
-	
-	*inspect { arg string; 
-		var dict  = ( 
+
+
+	*inspect { arg string;
+		var dict  = (
 			\a: 1,
 			\b: 2,
 			\c: 3,
@@ -182,8 +182,8 @@ ThunderInspector {
 			\w: 22,
 			\x: 23,
 			\y: 24,
-			\z: 24 
-		) ;	
+			\z: 24
+		) ;
 		var names = (
 		1: \vibragomma,
 		2: \vibraferro,
@@ -210,8 +210,8 @@ ThunderInspector {
 		23: \tubopiccolo,
 		24: \tubogrande
 		) ;
-		
+
 		string.do{|l| names[dict[l.asSymbol]].postln}
 	}
-	
+
 }

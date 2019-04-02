@@ -514,5 +514,5 @@ a.gui(hStep:6)
 a.showSonagramChord(-40, fromBin: 95)
 SonaGraphLily.new.showSonagramChord(a, -40, buffer:~sample)
 a.showSonagramChord(-30)
-
+a.showSonagramChord(-40)
 */

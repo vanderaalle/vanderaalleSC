@@ -54,7 +54,7 @@ SonaGraphGui {
 					}
 				}
 			} ;
-			88.do{|i|
+			amp[0].size.do{|i|
 				if (i%12 == 0){
 					Pen.strokeColor_(Color.hsv(0.4, 0.9, 0.8,0.5)) ;
 					Pen.line(0 @ (vStep*(i+1)), u.bounds.width @ (vStep*(i+1)) ) ;

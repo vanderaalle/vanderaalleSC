@@ -1,4 +1,5 @@
-/*
+// reimplementing RuMaster by skipping arduinoSMS
+
 RuMaster {
 
 	// The idea here is that we put together a certain number of arduinos,
@@ -57,6 +58,11 @@ RuMaster {
 // it assumes that you send voltage values normalized in [0.0, 1.0]
 // remaps to 255
 
+	// returns name
+	getById {arg id ;
+		^instrDict.findKeyForValue(id) ;
+	}
+
 	// set a value to a port by ID or instr name
 	set { arg idOrName, val ;
 		val = val.min(1.0) ; // prevents problems
@@ -96,7 +102,7 @@ RuMaster {
 	setByID { arg id, val ;
 		var arduino, port ;
 		#arduino, port = mapDict.at(id)	;
-		arduino.send($w, $a, port, 255*val) ;
+		arduino.putAll([253, port, 255*val, 255]) ;
 		this.changed(this, [id, val])
 	}
 
@@ -112,7 +118,7 @@ RuMaster {
 	zero {
 		arduinoList.do{ arg ard ;
 			[3,5,6,9,10,11].do{ arg port ;
-				ard.send($w, $a, port, 0) }
+				ard.putAll([253, port, 0, 255]) };
 			} ;
 	}
 
@@ -280,4 +286,3 @@ RuLogger {
 	}
 
 }
-*/

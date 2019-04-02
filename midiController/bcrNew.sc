@@ -12,8 +12,6 @@ a.gk4 = { |val| val.postln } ;
 a.bb5 = { |val| val.postln } ;
 */
 
-
-/*
 BCR {
 	var gk1, gk2, gk3, gk4, gk5, gk6, gk7, gk8 ;
 	var b1, b2, b3, b4, b5, b6, b7, b8 ;
@@ -56,32 +54,32 @@ BCR {
 */
 		// gk depends on "Encoder groups". Here we assume the first (topleft)
 		numArray =
-				Array.series(8, 1)
+		Array.fill(8, {|i| (i.asString++".10").asSymbol})
 				++
-				Array.series(40, 65)
+		Array.fill(8, {|i| (i.asString++".71").asSymbol})
 				++
-				Array.series(4,105)
+		Array.fill(8, {|i| (i.asString++".74").asSymbol})
 				++
-				Array.series(8, 33) ;
+		Array.fill(8, {|i| (i.asString++".7").asSymbol}) ;
 		nameArray =
 			// general knobs
 			Array.fill(8, {|ind| ("gk"++(ind+1)).asSymbol })
 			++
 			// buttons
-			Array.fill(8, {|ind| ("b"++(ind+1)).asSymbol })
-			++
-			Array.fill(8, {|ind| ("bb"++(ind+1)).asSymbol })
-			++
+			//Array.fill(8, {|ind| ("b"++(ind+1)).asSymbol })
+			//++
+			//Array.fill(8, {|ind| ("bb"++(ind+1)).asSymbol })
+			//++
 			//knobs
 			Array.fill(8, {|ind| ("k"++(ind+1)).asSymbol })
 			++
 			Array.fill(8, {|ind| ("kk"++(ind+1)).asSymbol })
 			++
 			Array.fill(8, {|ind| ("kkk"++(ind+1)).asSymbol })
-			++
-			Array.fill(4, {|ind| ("sw"++(ind+1)).asSymbol })
-			++
-			Array.fill(8, {|ind| ("gkb"++(ind+1)).asSymbol })
+			//++
+			//Array.fill(4, {|ind| ("sw"++(ind+1)).asSymbol })
+			//++
+			//Array.fill(8, {|ind| ("gkb"++(ind+1)).asSymbol })
 			;
 		numArray.do({ arg item ;
 			controlDict[item] = {} ;
@@ -92,7 +90,7 @@ BCR {
 
 	map {
 		MIDIIn.control = { arg src, chan, num, val ;
-			controlDict[num].value(val)
+			controlDict[(chan.asString++"."++num.asString).asSymbol].value(val)
 		} ;
 	}
 
@@ -478,5 +476,3 @@ BCR {
 		}
 
 }
-
-*/

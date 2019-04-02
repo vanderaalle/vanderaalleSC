@@ -296,7 +296,7 @@ PsPlotter {
 			str = str++((j)*xStep).asString++" "++zero.asString++" moveto\n";
 			str = str++((j)*xStep).asString++" "++i.asString++" lineto stroke\n"
 		} ;
-
+		str = str++"closepath stroke\n" ;
 	}
 
 	// total

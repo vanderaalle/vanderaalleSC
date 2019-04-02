@@ -6,11 +6,11 @@ RuFollower {
 	var <>pitch, <>loud ;
 	var <>ruMaster ;
 	var <>min, <>max ;
-	
+
 	*new { arg analyzer, array, evtDur = 1, ruMaster ;
 		^super.new.initRuFoll(analyzer, array, evtDur, ruMaster) ;
 	}
-	
+
 	initRuFoll { arg anAnalyzer, anArray, anEvtDur, aRuMaster ;
 		array = anArray ;
 		analyzer = anAnalyzer ;
@@ -24,38 +24,39 @@ RuFollower {
 		loud = 40 ;
 		min = 0; max = 1 ;
 	}
-	
+
 	generateEvent {
-		var id = (pitch.round(0.5).postln%12*2).asInteger ;
+		var id = (pitch.round(0.5)%12*2).asInteger ;
 		var port = array[id] ;
 		var flag = flagArray[id] ;
 //		("port:"+port+", id: "+id).postln ;
 		if (flagArray[id] == 0)
 			{ 	{
 				flagArray[id] = 1 ;
-				ruMaster.set(port, loud.linlin(-90, 0, min, max).postln) ;
+			ruMaster.getById(port).postln ;
+				ruMaster.set(port, loud.linlin(-90, 0, min, max)) ;
 				evtDur.wait ;
 				ruMaster.set(port, 0) ;
 				flagArray[id]  = 0 ;
 				}.fork
 			}
-		
+
 		}
-		
+
 	update { arg theChanged, theChanger, more ;
 		//more.postln ;
-		case 
+		case
 		{ more[0] == \onset }
 			 { "here".postln ;
-				this.generateEvent 
+				this.generateEvent
 			 }
 		{ more[0] == \pitch }
-			{ pitch = more[1] }		
+			{ pitch = more[1] }
 		{ more[0] == \amplitude }
-			{ loud = more[1].ampdb.round }		
+			{ loud = more[1].ampdb.round }
 
 	}
-	
+
 }
 
 
@@ -65,7 +66,7 @@ s.reboot ;
 
 ~inBus = Bus.audio(Server.local, 1) ;  // where we write in order to analyze
 
-// 
+//
 ~sx = {Out.ar(~inBus, SoundIn.ar(2)*MouseX.kr(0,30))}.play ;
 ~dx = {Out.ar(~inBus, SoundIn.ar(3)*MouseX.kr(0,30))}.play ;
 

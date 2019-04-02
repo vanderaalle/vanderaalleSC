@@ -99,9 +99,18 @@ HarmoSpectrum {
 		^over
 	}
 
-	// gives you back the chord of maxima, pitches and no dbs
-	overChord { |thresh = -30| ^this.specOver(thresh).collect{|i| i[0]} }
+	// return the chord of maxima, pitches and no dbs
+	overChord {|thresh = -30| ^this.specOver(thresh).collect{|i| i[0]} }
 
+	// return the average db for register (divisions of pitches)
+	registerAverage {|registers = 8|
+		var pitchForRegister = 88/registers ;
+		// we use clump so registers = 8 is good because of 88/8 = 11
+		^spectrum.collect{|pitchArr|
+			pitchArr.clump(pitchForRegister)
+			.collect{|reg| reg.sum/pitchForRegister}
+		}
+	}
 
 	// plays back the maxima chord, db weighted
 	playMaxima {|maxima, boost = 20| // lotta dbs coz typically low
