@@ -153,7 +153,9 @@ tagline = \"\"  % removed
 		path = if (path.isNil){"/tmp/sonoLily.ly"}{path} ;
 		res = if (res.notNil){"-dresolution=RES".replace("RES", res)}{""} ;
 		(
-			"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fEXT RES --output="++path.splitext[0] + path
+			// OSX only!
+			//"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fEXT RES --output="++path.splitext[0] + path
+			"lilypond  -fEXT RES --output="++path.splitext[0] + path
 		).replace("EXT", ext).replace("RES", res.postln).postln.unixCmd
 	}
 

@@ -264,7 +264,11 @@ BASS
 	renderLily {|path|
 		path = if (path.isNil){"/tmp/spectrumLily.ly"}{path} ;
 		(
-			"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fpng --output="++path.splitext[0] + path
+			// OSX, should be made platform independent
+			//"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fpng --output="++path.splitext[0] + path
+			// you must have lily AND in the path
+			"lilypond  -fpng --output="++path.splitext[0] + path
+
 		).unixCmd
 	}
 
