@@ -1,0 +1,151 @@
+TITLE:: HarmoSpectrum
+summary:: Creates interactive GUI for a SonaGraph spectrum.
+categories:: Undocumented classes
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+A SonaGraph spectrum is simply an array of 88 amp values in dB. HarmoSpectrum allows to explore it. It includes LilyPond support, assuming that:
+- you have LilyPond installed here: "Applications/LilyPond.app/Contents/Resources/bin/lilypond"
+- temporary dir is "/tmp". So, it writes to "/tmp/spectrumLily.ly"
+
+
+CLASSMETHODS::
+
+METHOD:: newFrom
+an instance is created from a SonaGraph amp bin, i.e. an 88 amp value array.
+
+ARGUMENT:: spectrum
+the spectrum, a SonaGraph amp bin.
+
+returns:: (describe returnvalue here)
+
+
+INSTANCEMETHODS::
+
+METHOD:: showSpectrumChord
+select the first num peaks, creates a LilyPond file, renders it and displays it into an Image. Mouse click plays back the resulting chord, each note with the relative amp.
+
+ARGUMENT:: num
+number of peaks.
+
+returns:: (describe returnvalue here)
+
+METHOD:: specMaxima
+calculates the maxima array as a number num of spectral maxima and db
+
+ARGUMENT:: num
+number of peaks.
+
+returns:: an array of arrays [peak midinote, ampInDb]
+
+METHOD:: maximaChord
+returns the chord of maxima, only pitches and no dbs
+
+ARGUMENT:: num
+number of peaks.
+
+returns:: an array like [peak midinote, ...]
+
+METHOD:: initHarmoSpectrum
+PRIVATE
+
+ARGUMENT:: aSpectrum
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: renderLily
+renders a file in LilyPond, png extension.
+
+ARGUMENT:: path
+the LilyPond file path.
+
+returns:: (describe returnvalue here)
+
+METHOD:: playMaxima
+plays back the maxima chord, db weighted.
+
+ARGUMENT:: maxima
+maxima array to be played.
+
+ARGUMENT:: boost
+a dB boost, as the resulting sound is lower than source.
+
+returns:: (describe returnvalue here)
+
+METHOD:: createLilyNote
+PRIVATE
+
+ARGUMENT:: midi
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: createLilyChord
+PRIVATE
+
+ARGUMENT:: chord
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: plotSpectrum
+plots the spectrum in an interactive GUI, clicking plays a note realted to colum pitch.
+
+ARGUMENT:: step
+step for GUI.
+
+returns:: (describe returnvalue here)
+
+METHOD:: specToLily
+given a maximaChord, writes the LilyPond file.
+
+ARGUMENT:: maximaChord
+the maximaChord.
+
+ARGUMENT:: path
+the path of the LilyPond file. If nil, "/tmp/spectrumLily.ly"
+
+returns:: (describe returnvalue here)
+
+METHOD:: spectrum
+the spectrum
+
+returns:: (describe returnvalue here)
+
+METHOD:: writeLilyChord
+PRIVATE
+
+ARGUMENT:: chord
+(describe argument here)
+
+ARGUMENT:: path
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+// here we start up server and defs
+SonaGraph.prepare ;
+
+// something to analyze, i.e a buffer
+~path = Platform.resourceDir +/+ "sounds/a11wlk01.wav";
+~sample = Buffer.read(s, ~path).normalize ;
+
+// an istance
+a = SonaGraph.new ;
+// now analyzing in real-time
+a.analyze(~sample,15) ; // rate depends on dur etc
+
+// we first provide an average spectrum, i.e. the average
+// array of all bins
+h = HarmoSpectrum.newFrom(a.calculateAvSpectrum)
+h.spectrum ; // the spectrum
+h.plotSpectrum; // interactive plotting
+h.specMaxima(6) ; // maxima includes note and dB, first 6 peaks
+h.maximaChord(4) ; // only notes,  first 4 peaks
+h.showSpectrumChord(4) ; // interactive notation GUI, first 4 peaks
+::

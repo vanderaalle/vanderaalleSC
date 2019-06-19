@@ -1,0 +1,145 @@
+TITLE:: PsPlotter
+summary:: PsPlotter generates a PostScript/PDF file with a plot of the passed data.
+categories:: GUI>Accessories
+related:: Reference/plot
+
+DESCRIPTION::
+Data that can be plotted are ArrayedCollection, Buffer, Envelope, audio Function, Signal, Wavetable. PostScript/PDF selection is based on the extension of the file passed in the path arg. Conversion to PDF makes use of pstopdf utility, called from cmd line. When plotting a buffer or an audio function the server must be booted.
+Tested on MacOSX but should be multiplatform, at least for PostScript generation.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+The only relevant method is the constructor one, that allows to specify all the available parameters and write the resulting file.
+
+ARGUMENT:: data
+The data to be passed. Automatic detection is then performed.
+
+ARGUMENT:: path
+The path where to write the resulting file. The provided extensions selects the type file (i.e ps or pdf).
+
+ARGUMENT:: min
+Minimum value for the plotting range.
+
+ARGUMENT:: max
+Maximum value for the plotting range.
+
+ARGUMENT:: samplePoints
+Allows to specify number of points used to resample the data collection. Resampling is used for Buffers, audio Functions and SoundFiles.
+
+ARGUMENT:: duration
+The duration of the real-time signal that will be plotted. Used for functions, the value is the same as the default for function plotting.
+
+ARGUMENT:: width
+Width of the resulting figure in points.
+
+ARGUMENT:: height
+Heights of the resulting figure in points.
+
+ARGUMENT:: xEvery
+Allows to specify the grid density for the x axis. A vertical line will be plotted every xEvery values.
+
+ARGUMENT:: yEvery
+Allows to specify the grid density for the y axis. A horizontal line will be plotted every yEvery values.
+
+ARGUMENT:: frame
+Width of the empty space around the plot, where labels are contained.
+
+ARGUMENT:: yGridOn
+Boolean, whether the grid on the y axis is plotted or not.
+
+ARGUMENT:: xGridOn
+Boolean, whether the grid on the x axis is plotted or not.
+
+ARGUMENT:: gridWidth
+Line width for the grid.
+
+ARGUMENT:: frameWidth
+Line width for the frame.
+
+ARGUMENT:: curveWidth
+Line width for the continuous curve.
+
+ARGUMENT:: speckleWidth
+Line width for the speckle contour elements.
+
+ARGUMENT:: barWidth
+Line width for the bars.
+
+ARGUMENT:: gridCol
+Grid color, as a RGB array.
+
+ARGUMENT:: frameCol
+Frame color, as a RGB array.
+
+ARGUMENT:: curveCol
+Continuous curve color, as a RGB array.
+
+ARGUMENT:: speckleCol
+Speckle color, as a RGB array.
+
+ARGUMENT:: barCol
+Bar color, as a RGB array.
+
+ARGUMENT:: continuousOn
+Boolean, whether the continuous curve is plotted or not.
+
+ARGUMENT:: discreteOn
+Boolean, whether the speckle contour is plotted or not.
+
+ARGUMENT:: barOn
+Boolean, whether the bars are plotted or not.
+
+ARGUMENT:: fontName
+Name of the font used for labels.
+
+ARGUMENT:: fontSize
+Dimension of the font used for the label in point.
+
+ARGUMENT:: fontCol
+Font color for the labels, as a RGB array.
+
+ARGUMENT:: yLabelOn
+Boolean, whether the labels on the y axis are plotted or not.
+
+ARGUMENT:: xLabelOn
+Boolean, whether the labels on the x axis are plotted or not.
+
+ARGUMENT:: xLabMultiplier
+A multiplier for scaling values on x axis. It is automatically set for Buffers and Functions so that x labels display correct time values.
+
+ARGUMENT:: yLabMultiplier
+A multiplier for scaling values on y axis.
+
+ARGUMENT:: xLabRound
+Rounding factor for x axis labels.
+
+ARGUMENT:: yLabRound
+Rounding factor for y axis labels.
+
+ARGUMENT:: xLabStart
+Offset in point for x axis labels.
+
+ARGUMENT:: yLabStart
+Offset in point for y axis labels.
+
+ARGUMENT:: xLabEvery
+The multiplier specifies every how many grid elements of the x axis the label is plotted. The ratio is that grid elements can be unlabelled.
+
+ARGUMENT:: yLabEvery
+The multiplier specifies every how many grid elements of the y axis the label is plotted. The ratio is that grid elements can be unlabelled.
+
+ARGUMENT:: zeroWidth
+Line width for the zero axis.
+
+returns:: (describe returnvalue here)
+
+
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

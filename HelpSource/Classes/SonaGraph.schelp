@@ -1,0 +1,281 @@
+TITLE:: SonaGraph
+summary:: A piano-tuned spectrum analyzer/visualizer, inspired by Kay Sonagraph
+categories:: Analysis
+related:: Classes
+
+DESCRIPTION::
+The classic Kay Sonagraph was based on a bank of filters used to plot on paper spectral information, widely used in phonetics and acoustic analysis (bird singing). SonaGraph works in two steps. First, a sound is analized by passing it through a 88 band pass filter, tuned on piano keys. Amps in dB and pitch are collected and data are then available to manipulation/visualization. Second, data can be explored interactively by the included GUIs.
+SonaGraph requires MdaPiano and Tartini Ugens, WSLib for MIDI, LilyPond for notation.
+
+
+CLASSMETHODS::
+
+METHOD:: prepare
+An init method that is used to boot the server and load the required SynthDefs.
+
+
+INSTANCEMETHODS::
+
+METHOD:: amp
+An array of amplitude in dB, as a set of time slices, its size depending on the anRate (see) argument.
+
+returns:: an array of arrays.
+
+METHOD:: pitch
+Data structure for pitch.
+
+returns:: An array of pitches, size depending on anRate.
+
+METHOD:: hasPitch
+Data structure for hasPitch.
+
+returns:: An array of hasPitches, size depending on anRate.
+
+
+METHOD:: buf
+The buffer to be analyzed
+
+METHOD:: analyze
+Starts analysis in real-time. Once buffer reading is completed, analysis stop.
+The method sets both buffer and anRate vars.
+
+ARGUMENT:: buffer
+the buffer to be analysed.
+
+ARGUMENT:: rate
+The rate at which analysis polls data.
+
+ARGUMENT:: rq
+The rq for the filters, default is 0.01, which typically works fine.
+
+METHOD:: anRate
+The rate expressed as a frequency (Hz) for amplitude/pitch sampling. The final size of data structure depends on anRate x duration in seconds of the buffer.
+
+METHOD:: synthesize
+Resynthesizes the amp array by means of sinusoids.
+
+METHOD:: stopSynthesize
+Stops synthesizing. While playing, it cleans up.
+
+METHOD:: writeArchive
+Writes the data structure to a file, so that it can be retrieved again.
+
+ARGUMENT:: path
+Path to the file.
+
+
+METHOD:: readArchive
+Retrieve and set a previously archived data structure.
+
+ARGUMENT:: path
+Path to the file.
+
+METHOD:: gui
+Creates a GUI for interactive exploration by calling internally a dedicated class (SonaGraphGui). Note that the gui hasn't scroll. When you press on the view, a piano note of the related freq is played, and time, note and freq are displayed. By pressing the space bar, sound is played back from the cursor position. To stop playback, press again the space bar.
+
+ARGUMENT:: buffer
+The buffer to be played back, i.e. the one used for analysis. If gui is created while the instance for analysis is still on, buffer can be nil and the previously passed one is used.
+
+ARGUMENT:: hStep
+Horizontal step. As there is no zoom feature, anRate x duration x hStep gives the overall width of the gui. Thus, hStep must be set according to your screen dimension.
+
+ARGUMENT:: vStep
+Vertical step for each cell (height = vStep x 88).
+
+METHOD:: postScript
+Allows to generate a PostScript file of the sonagram. It includes labelling. On y axis labels represent octave and Hz on opposite side.
+
+ARGUMENT:: path
+Path of the file, if extension is ps a PostScript file is generated, if pdf the method calls pstopdf from Terminal, creates a pdf, and remove the generated ps file. If pstopdf is not accessible, you can write ps and convert by hand.
+
+ARGUMENT:: width
+Width (+frame) in pixel of the PostScript file.
+
+ARGUMENT:: height
+Height (+frame) in pixel of the PostScript file.
+
+ARGUMENT:: frame
+Frame in pixel for the drawing, it is added to both height and width.
+
+ARGUMENT:: xEvery
+Grid spacing on x axis, in seconds.
+
+ARGUMENT:: xGridOn
+Allows to disable vertical grid plotting.
+
+ARGUMENT:: yGridOn
+Allows to disable horizontal grid plotting.
+
+ARGUMENT:: xLabelOn
+Allows to disable vertical label plotting.
+
+ARGUMENT:: gridCol
+a Color for the grid.
+
+ARGUMENT:: frameCol
+a Color for the frame.
+
+ARGUMENT:: cellType
+if \oval fill each cell with an oval, else with a filled rect. Default is \oval.
+
+
+METHOD:: calculateAvHasPitch
+Returns the average hasPitch between fromBin and toBin.
+
+ARGUMENT:: fromBin
+Beginning bin. If nil, it is set to 0.
+
+ARGUMENT:: toBin
+Ending bin. If nil, it is set to last bin.
+
+METHOD:: calculateAvPitch
+Returns the average pitch between fromBin and toBin.
+
+ARGUMENT:: fromBin
+Beginning bin. If nil, it is set to 0.
+
+ARGUMENT:: toBin
+Ending bin. If nil, it is set to last bin.
+
+
+METHOD:: calculateAvSpectrum
+Returns the average spectrum between fromBin and toBin.
+
+ARGUMENT:: fromBin
+Beginning bin. If nil, it is set to 0.
+
+ARGUMENT:: toBin
+Ending bin. If nil, it is set to last bin.
+
+
+METHOD:: plotAvSpectrum
+plots the spectrum in an interactive GUI, clicking plays a note related to colum pitch.
+
+ARGUMENT:: fromBin
+Beginning bin. If nil, it is set to 0.
+
+ARGUMENT:: toBin
+Ending bin. If nil, it is set to last bin.
+
+METHOD:: showSpectrumChord
+select the first num peaks, creates a LilyPond file, renders it and displays it into an Image. Mouse click plays back the resulting chord, each note with the relative amp. It assumes that:
+- you have LilyPond installed here: "Applications/LilyPond.app/Contents/Resources/bin/lilypond"
+- temporary dir is "/tmp". So, it writes to "/tmp/sonoLily.ly"
+
+ARGUMENT:: num
+number of peaks.
+
+ARGUMENT:: fromBin
+Beginning bin. If nil, it is set to 0.
+
+ARGUMENT:: toBin
+Ending bin. If nil, it is set to last bin.
+
+METHOD:: showSonagram
+creates LilyPond file, renders it and displays it in an Image.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: res
+resolution of the image, can be scaled down to reduce image dimensions.
+
+ARGUMENT:: width
+width of the window containing the image.
+
+ARGUMENT:: height
+height of the window containing the image.
+
+METHOD:: showSonagramFile
+creates LilyPond file, renders it and opens it thrugh Preview app.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: ext
+extension of the file to be rendered, default is "pdf".
+
+METHOD:: makeSonagramFile
+creates LilyPond file and renders it.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: ext
+extension of the file to be rendered, default is "pdf".
+
+
+METHOD:: playSonoChord
+plays it back immediately the amp structure. If a note is present in the previous block,it is not played again for sake of intelligibility.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: boost
+a dB boost for amps.
+
+EXAMPLES::
+
+code::
+
+
+// here we start up server and defs
+SonaGraph.prepare ;
+
+// something to analyze, i.e a buffer
+~path = Platform.resourceDir +/+ "sounds/a11wlk01.wav";
+~sample = Buffer.read(s, ~path).normalize ;
+
+// an istance
+a = SonaGraph.new ;
+// now analyzing in real-time
+a.analyze(~sample,50) ; // high rate! 10 could be enough, depends on dur
+
+// writing to an archive, log extension is not necesssary
+a.writeArchive("/Users/andrea/Desktop/a11.log") ;
+
+a.gui(hStep:5) ; // directly, if anRate=1 then default hStep 2.,5 fine
+
+// again
+a = SonaGraph.new ;
+// read the log, may requires some time
+a.readArchive("/Users/andrea/Desktop/a11.log") ;
+
+a.gui(~sample, 5) ; // now we need the pass the sample for playback
+// same as:
+g = SonaGraphGui(a, ~sample,5).makeGui ;
+
+// resynthesis
+a.synthesize ; // start synthesis
+a.stopSynthesize ; // stop synthesis routine and free
+
+// postscript generation
+a.postScript("/Users/andrea/Desktop/a11.ps", ~sample, xEvery:0.25) ;
+// directly pdf
+a.postScript("/Users/andrea/Desktop/a11.pdf", ~sample, xEvery:0.25) ;
+
+::

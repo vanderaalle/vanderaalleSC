@@ -1,0 +1,194 @@
+TITLE:: SonaGraphLily
+summary:: Interface from SonaGraph sonagram to LilyPond
+categories:: Undocumented classes
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+It renders the bins to a LilyPond score. Quantization is related to bins, 1 bin -> 1 16th. Then, bpm is calculate in relation to anRate (analysis frame rate). Rendering requires LilyPond app installed. At the moment, there is an absolute path that might be ok for MacOs standard.
+It assumes that:
+- you have LilyPond installed here: "Applications/LilyPond.app/Contents/Resources/bin/lilypond"
+- temporary dir is "/tmp". So, it writes to "/tmp/sonaLily.ly"
+
+
+CLASSMETHODS::
+
+
+INSTANCEMETHODS::
+
+METHOD:: makeLily
+creates a LilyPond file.
+
+ARGUMENT:: sonagraph
+the sonagraph instance.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: path
+path for LilyPond file.
+
+returns:: (describe returnvalue here)
+
+METHOD:: renderLily
+render LilyPond file by calling LilyPond from terminal.
+
+ARGUMENT:: path
+path for the LilyPond file, same dir is used for output.
+
+ARGUMENT:: ext
+extension, like "png" or "pdf", for output file
+
+ARGUMENT:: res
+resolution of the image, not used for pdf.
+
+returns:: (describe returnvalue here)
+
+METHOD:: makeVoice
+PRIVATE
+
+ARGUMENT:: vSeq
+(describe argument here)
+
+ARGUMENT:: midinote
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: showSonagram
+creates LilyPond file, renders it and displays it in an Image.
+
+ARGUMENT:: sonagraph
+the sonagrah instance.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: res
+resolution of the image, can be scaled down to reduce image dimensions.
+
+ARGUMENT:: width
+width of the window containing the image.
+
+ARGUMENT:: height
+height of the window containing the image.
+
+returns:: (describe returnvalue here)
+
+METHOD:: createLilyVoices
+PRIVATE
+
+ARGUMENT:: amp
+(describe argument here)
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+returns:: (describe returnvalue here)
+
+METHOD:: makeQuarter
+PRIVATE
+
+ARGUMENT:: qSeq
+(describe argument here)
+
+ARGUMENT:: midinote
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: createLilyNote
+PRIVATE
+
+ARGUMENT:: midi
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: makeSonagram
+creates the LilyPond file and renders it.
+
+ARGUMENT:: sonagraph
+the sonagraph instance.
+
+ARGUMENT:: thresh
+dB threshold, only above threshold bins are considered.
+
+ARGUMENT:: fromBin
+begin bin, integer. If nil, then first bin.
+
+ARGUMENT:: toBin
+end bin, integer. If nil, then last bin.
+
+ARGUMENT:: ext
+extension, like "png" or "pdf", for output file
+
+ARGUMENT:: res
+resolution of the image, not used for pdf.
+
+returns:: (describe returnvalue here)
+
+METHOD:: makeLilyFile
+PRIVATE
+
+ARGUMENT:: data
+(describe argument here)
+
+ARGUMENT:: amp
+(describe argument here)
+
+ARGUMENT:: tempo
+(describe argument here)
+
+ARGUMENT:: path
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: createLilyVoice
+PRIVATE
+
+ARGUMENT:: voice
+(describe argument here)
+
+ARGUMENT:: midinote
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+// here we start up server and defs
+SonaGraph.prepare ;
+
+// something to analyze, i.e a buffer
+~path = Platform.resourceDir +/+ "sounds/a11wlk01.wav";
+~sample = Buffer.read(s, ~path).normalize ;
+
+// an istance
+a = SonaGraph.new ;
+// now analyzing in real-time
+a.analyze(~sample,15) ; // rate depends on dur etc
+
+// write the file
+SonaGraphLily.new.makeLily(a, -30, 45, 60,"/tmp/sonoLily.ly")
+// render the file, previous path is default, with res = 50
+SonaGraphLily.new.renderLily(res:50)
+// directly made, rendered, reloaded
+SonaGraphLily.new.showSonagram(a, -30)
+// created and rendered in pdf, not loaded
+SonaGraphLily.new.makeSonagram(a, -30, ext:"pdf")
+::
