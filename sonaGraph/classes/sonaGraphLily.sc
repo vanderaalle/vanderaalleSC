@@ -106,7 +106,7 @@ SonaGraphLily {
 
 	makeLilyFile {|data, amp, tempo = 60, path|
 		var template = "
-\\version \"2.19.39\"
+\\version \"2.18.2\"
 
 
 \\header{
@@ -144,18 +144,24 @@ tagline = \"\"  % removed
 	makeLily {|sonagraph, thresh = -40, fromBin = 0, toBin, path|
 		var tempo, data ;
 		toBin = if (toBin.isNil){sonagraph.amp.size-1}{toBin} ;
-		tempo = 60/(sonagraph.anRate.reciprocal*4) ;
+		// no float, on macosx worked, ??
+		tempo = (60/(sonagraph.anRate.reciprocal*4)).asInteger ;
 		data = this.createLilyVoices(sonagraph.amp[fromBin..toBin], thresh) ;
 		this.makeLilyFile(data, sonagraph.amp[fromBin..toBin], tempo, path)
 	}
 
 	renderLily {|path, ext = "png", res|
+		// linux vs OSX, no win
+		var pt = if(thisProcess.platform.name == \linux)
+		{"lilypond  -fEXT RES --output="}
+		{"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fEXT RES --output="} ;
 		path = if (path.isNil){"/tmp/sonoLily.ly"}{path} ;
 		res = if (res.notNil){"-dresolution=RES".replace("RES", res)}{""} ;
 		(
 			// OSX only!
 			//"Applications/LilyPond.app/Contents/Resources/bin/lilypond  -fEXT RES --output="++path.splitext[0] + path
-			"lilypond  -fEXT RES --output="++path.splitext[0] + path
+			//"lilypond  -fEXT RES --output="++path.splitext[0] + path
+			pt++path.splitext[0] + path
 		).replace("EXT", ext).replace("RES", res.postln).postln.unixCmd
 	}
 
@@ -203,10 +209,20 @@ tagline = \"\"  % removed
 
 		stopSonoChord = { if (pianoRt.notNil){pianoRt.stop} } ;
 		{
+			// clean up
+			if (File.exists( "/tmp/sonoLily.ly"))
+			{ File.delete( "/tmp/sonoLily.ly") } ;
+			if (File.exists( "/tmp/sonoLily.png"))
+			{ File.delete( "/tmp/sonoLily.png") } ;
+			//not sure if it's synchronous
+			while {File.exists( "/tmp/sonoLily.ly")
+			&& 	File.exists( "/tmp/sonoLily.png")} { 0.1.wait } ;
 			this.makeLily(sonagraph, thresh, fromBin, toBin, "/tmp/sonoLily.ly") ;
-			1.wait ;
+			//1.wait ;
+			while { File.exists( "/tmp/sonoLily.ly").not }{ 0.1.wait } ;
 			this.renderLily(res:res) ;
-			2.wait ;
+			while { File.exists( "/tmp/sonoLily.png").not }{ 0.1.wait }  ;
+			//2.wait ;
 			im = Image.new("/tmp/sonoLily.png");
 			im.interpolation = 'smooth';
 			// a bit shaky
@@ -325,7 +341,8 @@ tagline = \"\"  % removed
 		toBin = if (toBin.isNil){sonagraph.amp.size-1}{toBin} ;
 		v = this.splitIntoVoices(sonagraph.amp[fromBin..toBin], thresh) ;
 		data = [this.createSequence(v[0]), this.createSequence(v[1])] ;
-		tempo = 60/(sonagraph.anRate.reciprocal*4) ;
+		// on macosx it worked as float, ??
+		tempo = (60/(sonagraph.anRate.reciprocal*4)).asInteger ;
 		this.makeLilyChordFile(data, sonagraph.amp, tempo, path)
 	}
 
@@ -333,7 +350,7 @@ tagline = \"\"  % removed
 
 	makeLilyChordFile {|data, amp, tempo = 60, path|
 		var template = "
-\\version \"2.19.2\"
+\\version \"2.18.2\"
 
 \\header {
 tagline = \"\"  % removed
@@ -428,10 +445,18 @@ BASS
 		stopSonoChord = { if (pianoRt.notNil){pianoRt.stop} } ;
 
 		{
+						// clean up
+			if (File.exists( "/tmp/sonoChordLily.ly"))
+			{ File.delete( "/tmp/sonoChordLily.ly") } ;
+			if (File.exists( "/tmp/sonoChordLily.png"))
+			{ File.delete( "/tmp/sonoChordLily.png") } ;
+			// not sure if it's synchronous
+			while {File.exists( "/tmp/sonoChordLily.ly")
+			&& 	File.exists( "/tmp/sonoChordLily.png")} { 0.1.wait } ;
 			this.makeLilyChord(sonagraph, thresh, fromBin, toBin, "/tmp/sonoChordLily.ly") ;
-			1.wait ;
+			while { File.exists( "/tmp/sonoChordLily.ly").not } { 0.1.wait } ;
 			this.renderLily("/tmp/sonoChordLily.ly", res:res) ;
-			2.wait ;
+			while {File.exists( "/tmp/sonoChordLily.png").not} { 0.1.wait } ;
 			im = Image.new("/tmp/sonoChordLily.png");
 			im.interpolation = 'smooth';//.postln;
 			// a bit shaky
@@ -482,7 +507,8 @@ BASS
 /*
 SonaGraph.prepare ;
 // something to analyze, i.e a buffer
-~path ="/Users/andrea/musica/regna/fossilia/compMine/erelerichnia/fragm/snd/vareseOctandreP18M5N[8,9,0,7,11,6].aif"; ~sample = Buffer.read(s, ~path).normalize ;
+~path = Platform.resourceDir +/+ "sounds/a11wlk01.wav";
+~sample = Buffer.read(s, ~path).normalize ;
 
 // an istance
 a = SonaGraph.new;
@@ -513,8 +539,8 @@ SonaGraph.prepare ;
 // an istance
 a = SonaGraph.new ;
 a.gui(hStep:6)
-a.showSonagramChord(-40, fromBin: 95)
+a.showSonagramChord(-40, fromBin: 10)
 SonaGraphLily.new.showSonagramChord(a, -40, buffer:~sample)
 a.showSonagramChord(-30)
-a.showSonagramChord(-40)
+a.showSonagram(-30)
 */

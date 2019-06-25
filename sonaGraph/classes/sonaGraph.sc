@@ -13,6 +13,10 @@ SonaGraph {
 	var synths, synthRt ;
 	var pianoRt ;
 	var <>att ;
+	// added for RT
+	var anBus, x, y, buffer, recorder ; // we need to call it back from stopRec
+	var recPath ;
+
 
 	*prepare {
 		// requires mdaPiano and Tartini Ugens
@@ -68,6 +72,9 @@ SonaGraph {
 				Out.ar(0, SinOsc.ar(freq, mul:amp))
 			}).add ;
 
+			SynthDef(\sonaRecord, {arg bufnum, inBus;
+				DiskOut.ar(bufnum, In.ar(inBus, 1));
+			}).add ;
 
 		} ;
 	}
