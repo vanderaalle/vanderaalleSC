@@ -106,8 +106,8 @@ SonaGraph {
 			// flat and remove strange values
 			pitch = pitch.flat.postln.collect{|i|
 				case {i < 21} {i = 21 }
-				{i > (88+21)} {i = (88+21) }
-				{(i >=21)&&(i<=(88+21))} {i}}.postln ;
+				{i > (88+20)} {i = (88+20) }
+				{(i >=20)&&(i<=(88+20))} {i}}.postln ;
 			hasPitch = hasPitch.flat.postln ;
 			amp = amp[..
 				(buffer.numFrames/Server.local.sampleRate*rate).asInteger

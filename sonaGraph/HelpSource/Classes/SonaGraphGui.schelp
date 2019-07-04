@@ -157,5 +157,5 @@ a = SonaGraph.new ;
 a.analyze(~sample,15) ; // rate depends on dur etc
 
 SonaGraphGui.new(a, ~sample, hStep:5, vStep:6).makeGui ;
-SonaGraphGui.new(a, ~sample, hStep:10, vStep:3).makeGui ;
+SonaGraphGui.new(a, ~sample, hStep:15, vStep:3, width:600).makeGui ;
 ::

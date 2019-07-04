@@ -112,6 +112,12 @@ HarmoSpectrum {
 		}
 	}
 
+	// return a normalized sum of amp for chroma classes
+	chromaAmp {|thresh = -30|
+		// we skip four highest notes for sake of simplicity (%12)
+		^spectrum[..83].clump(12).flop.collect{|i| i.sum/12} ; // has size = 12
+	}
+
 	// plays back the maxima chord, db weighted
 	playMaxima {|maxima, boost = 20| // lotta dbs coz typically low
 		maxima.do{|i|

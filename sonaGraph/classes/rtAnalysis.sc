@@ -21,8 +21,8 @@
 			amp = [] ; pitch = []; hasPitch = []; anRate = rate ;
 			buf = buffer ;
 			ampResp = OSCFunc({ |msg|  amp = amp.add(msg[3..]) }, '/amp');
-			pitchResp = OSCFunc({ |msg|  pitch = pitch.add(msg[3..].postln) }, '/pitch');
-			hasPitchResp = OSCFunc({ |msg|  hasPitch = hasPitch.add(msg[3..].postln) }, '/hasPitch');
+			pitchResp = OSCFunc({ |msg|  pitch = pitch.add(msg[3..]) }, '/pitch');
+			hasPitchResp = OSCFunc({ |msg|  hasPitch = hasPitch.add(msg[3..]) }, '/hasPitch');
 			x.set(\in, anBus) ; y.set(\in, anBus) ;
 		}.fork ;
 	}
@@ -74,7 +74,7 @@
 SonaGraph.prepare ;
 
 b = Bus.audio(s, 1) ;
-x = {Out.ar([0, b], SoundIn.ar)}.play
+x = {Out.ar([0, b], Mix(SoundIn.ar([0,1])))}.play
 // an istance
 a = SonaGraph.new ;
 // now analyzing in real-time
@@ -83,4 +83,5 @@ x.free
 
 a.stopAnalyzingRT
 a.gui
+a.playSonoChord(-30)
 */
