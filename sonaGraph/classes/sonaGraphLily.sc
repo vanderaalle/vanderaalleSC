@@ -282,8 +282,8 @@ tagline = \"\"  % removed
 	}
 
 	// given a chord, split it into treble and bass
-	splitChordStruct {|chord|
-		^[chord.select{|i| i>= 60}, chord.select{|i| i< 60}]
+	splitChordStruct {|chord, pThresh = 60| // middle c
+		^[chord.select{|i| i>= pThresh}, chord.select{|i| i< pThresh}]
 	}
 
 	// given amp and thresh, convert into a chord
@@ -294,9 +294,9 @@ tagline = \"\"  % removed
 	}
 
 	// split all bins from amp, then flop to group voiced
-	splitIntoVoices {|amp, thresh|
+	splitIntoVoices {|amp, thresh, pThresh = 60|
 		^this.collectChords(amp, thresh).collect{|i|
-			this.splitChordStruct(i)
+			this.splitChordStruct(i, pThresh)
 		}.flop
 		// treble and bass
 	}
@@ -406,6 +406,7 @@ BASS
 		toBin = if (toBin.isNil){sonagraph.amp.size-1}{toBin} ;
 		{
 			this.makeLilyChord(sonagraph, thresh, fromBin, toBin, "/tmp/sonoChordLily.ly") ;
+			// should be made synchronous
 			1.wait ;
 			this.renderLily("/tmp/sonoChordLily.ly", ext:ext, res:res);
 		}.fork

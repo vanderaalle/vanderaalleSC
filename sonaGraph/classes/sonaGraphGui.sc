@@ -13,13 +13,14 @@ SonaGraphGui {
 	var <>selected, <>from, <>to ;
 
 
-	*new { arg sonaGraph, buffer, hStep = 2.5, vStep = 6, width ;
-		^super.new.initSonaGraphGui(sonaGraph, buffer, hStep, vStep, width)
+	*new { arg sonaGraph, thresh, buffer, hStep = 2.5, vStep = 6, width ;
+		^super.new.initSonaGraphGui(sonaGraph, thresh, buffer, hStep, vStep, width)
 	}
 
-	initSonaGraphGui { arg aSonaGraph, aBuffer,
+	initSonaGraphGui { arg aSonaGraph, aThresh, aBuffer,
 		aHStep, aVStep, aWidth ;
 		sonaGraph = aSonaGraph ;
+		thresh = aThresh ;
 		buffer = aBuffer ;
 		hStep = aHStep; vStep = aVStep ;
 		sf = SoundFile.new ;
@@ -31,9 +32,9 @@ SonaGraphGui {
 		width = aWidth ;
 	}
 
-	makeGui { |thresh = -96, sfViewH = 100, labView = 20, labStep = 5,
+	makeGui { |sfViewH = 100, labView = 20, labStep = 5,
 		pitchOn = true|
-		// thresh: used to select active band AND pitch
+		// thresh: used to select active band AND pitc
 		var flag, player, binBar ;
 		var col ;
 		// if width is passed then it is used and the window will scroll if shorter
@@ -117,12 +118,14 @@ SonaGraphGui {
 		.keyDownAction_{ |doc, char, mod, unicode, keycode, key|
 			if ((unicode == 32)&&(flag == true)){
 				flag = false ;
+				cursor[0].postln ;
+				cursorView.bounds.width.postln ;
 				player = Synth(\player, [\buf, buffer,
 					\start, cursor[0]
-					.linlin(0, cursorView.bounds.width, 0, sf.numFrames),
-					\dur, buffer.numFrames -
+					.linlin(0, cursorView.bounds.width, 0, buffer.numFrames),
+					\dur, (buffer.numFrames -
 					cursor[0]
-					.linlin(0, cursorView.bounds.width, 0, sf.numFrames)
+						.linlin(0, cursorView.bounds.width, 0, buffer.numFrames)).postln/Server.local.sampleRate
 				])
 			}
 			{

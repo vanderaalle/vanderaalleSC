@@ -3,7 +3,7 @@
 // n bins of 88 values, where value is db and index pitch
 
 // here we use only class methods
-// data are constantly returned
+// data are constantly returned = ytou always get a spec
 
 SD : SpectraDaw {} // just for shortcut
 
@@ -13,7 +13,7 @@ SpectraDaw {
 
 	// start with an array of amps
 	*from { arg sonaAmp, thresh = -96 ;
-		^this.filterAbove(sonaAmp, thresh)
+		^this.ampAbove(sonaAmp, thresh)
 	}
 
 	// mix a an array of spectra
@@ -104,14 +104,90 @@ SpectraDaw {
 		}
 	}
 
-	*filterAbove {|spec, thresh = -30|
+	*flatAmp {|spec, db = -40|
+		^spec.collect{|p|
+			p.collect{|deb| if(deb != -96){db}{-96}}
+		}
+	}
+
+	// amp filtering out
+	*ampAbove {|spec, thresh = -30|
 		^spec.collect{|p|
 			p.collect{|db| if(db > thresh){db}{-96}}
 		}
 	}
+	*ampBelow {|spec, thresh = -30|
+		^spec.collect{|p|
+			p.collect{|db| if(db < thresh){db}{-96}}
+		}
+	}
 
+	// pitch filtering out
+	*pitchAbove {|spec, pitch|
+		var t = pitch-21 ;
+		^spec.collect{|i, j|
+			i.collect{|p, n|
+				if(n > t){p}{-96}
+			}
+		}
+	}
+	*pitchBelow {|spec, pitch|
+		var t = pitch-21 ;
+		^spec.collect{|i, j|
+			i.collect{|p, n|
+				if(n < t){p}{-96}
+			}
+		}
+	}
+	*pitchRange {|spec, lo, hi|
+		^this.pitchBelow(this.pitchAbove(spec, lo), hi)
+	}
+
+
+	// you pass an array of pitches. Only those are kept
+	*pitchMask {|spec, mask|
+		var m = mask-21 ;
+		^spec.collect{|i, j|
+			i.collect{|p, n|
+				if(m.includes(n)){p}{-96}
+			}
+		}
+	}
+
+	// symmetrical excision operations
 	*cut {|spec, from, to|
 		^spec[from..to]
+	}
+	*remove {|spec, from, to|
+		^(spec[0..from]++spec[to..(spec.size-1)])
+	}
+
+	*silence {|bins|
+		^Array.fill(bins, { Array.fill(88, {-96})})
+	}
+
+	*insertSilence {|spec, which, bins|
+		^(spec[0..which]++this.silence(bins)++spec[which..(spec.size-1)])
+	}
+
+	*cancel {|spec, from, to|
+		^(spec[0..from]++this.silence(to-from)++spec[to..(spec.size-1)])
+	}
+
+	*removeAt {|spec, bin, pitch|
+		^spec.collect{|i, j|
+			i.collect{|p, n|
+				if((j == bin).and((n+21) == pitch)){-96}{p}
+			}
+		}
+	}
+
+	*insertAt {|spec, bin, pitch, amp = 0|
+		^spec.collect{|i, j|
+			i.collect{|p, n|
+				if((j == bin).and((n+21) == pitch)){amp}{p}
+			}
+		}
 	}
 
 	// shifts spec of interval, what happens when lower or higher?
@@ -168,6 +244,115 @@ SpectraDaw {
 			}
 		}.fork ;
 
+	}
+
+	// conversion, assuming 4/4
+	// we assume to start from 1 in music
+	*barbin {|measure, quarter, sixthteen|
+		^((measure-1)*16)+((quarter-1)*4)+(sixthteen-1)
+	}
+	*binbar {|bins|
+		var meas = (bins/16).trunc.asInteger ;
+		var quarter = ((bins-(meas*16))/4).asInteger ;
+		var sixthteen = bins - (meas*16)-(quarter*4) ;
+		^[meas+1, quarter+1, sixthteen+1]
+	}
+
+	// returns duration
+	dur {|spec, rate, asTimeString = false|
+		if (asTimeString){
+			^((spec)*rate.reciprocal).asTimeString
+		}{
+			^(spec)*rate.reciprocal
+		}
+	}
+
+	// archiving spec
+	*writeArchive {|spec, path|
+		spec.writeArchive(path) ;
+	}
+	*readArchive {|path|
+		^Object.readArchive(path)
+	}
+
+	// as event list support
+	// convert into a csound score like format
+
+	*eventsFromVoice {|voice|
+		var evList = [] ;
+		var ev ;
+		var v = Pseq([-96]++voice).asStream ; // init
+		var act = v.next;
+		var next;
+		var dur, att ;
+		var i = 0 ;
+		while{ act.notNil }{
+			next = v.next.post ; ": ".post ;
+			case
+			{ (act == -96) && (next == -96) }
+			{ //"no event detected".postln ;
+				dur = nil ;
+			}
+			{ (act == -96) && (next != -96) }
+			{ "NEW event started".postln ;
+				att = i ;
+				dur = 1 ;
+			}
+			{ (act != -96) && (next != -96) && (next.notNil) }
+			{ "KEEPing event".postln ;
+				dur = dur+1
+			}
+			{ (act != -96) && ((next == -96)||(next.isNil)) }
+			{ "END event".postln ;
+				evList = evList.add([att, dur])
+			} ;
+			i = i+1 ;
+			act = next ;
+		} ;
+		^evList
+	}
+
+	*writeEventList {|evList, path|
+		evList.writeArchive(path)
+	}
+	*readEventList {|path|
+		^Object.readArchive(path)
+	}
+
+	*eventsFromVoices {|spec|
+		^spec.flop.collect{|p|
+			this.eventsFromVoice(p)
+		}
+	}
+
+	// here we have an idea of bins into evList
+	*getMaxExt {|evList|
+		var max = 0 ;
+		evList.select{|v|v != [] }
+		.do{|v| v.do{|e| if((e[0]+e[1]) > max){ max = e[0]+e[1] }} };
+		^max
+	}
+
+	*playEvents {|evList, rate, boost, from = 0|
+		var cnt = from ;
+		^{
+			(this.getMaxExt(evList)-from).do{
+				evList.do{|i, j|
+					if(i != []){
+						i.do{|ev|
+						if(ev[0] == cnt){
+							Synth(\mdaPiano,
+							[\freq, (j+21).midicps,
+								\mul, (boost).dbamp]
+								)
+							}
+						}
+					}
+				} ;
+				cnt = cnt +1 ;
+				rate.reciprocal.wait ;
+			}
+		}.fork
 	}
 
 }
@@ -241,4 +426,7 @@ z = SD.insertEvery(m,2, \fill)
 SpectraDawGui(z, 4).makeGui
 z = SD.insertEvery(z,2, \empty)
 SD.check(z)
+
+SD.binbar(4)
+SD.barbin(1, 1, 1)
 */
