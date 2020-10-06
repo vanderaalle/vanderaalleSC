@@ -543,7 +543,7 @@ SonaGraph {
 		{ buffer.isNil }{ buf } ;
 		thresh = if(thresh.isNil){-96}{thresh} ;
 		if (bf.isNil){"Please pass a buffer!".postln}{
-			SonaGraphGui(this, bf, hStep, vStep).makeGui(thresh,  labStep:labStep, pitchOn:pitchOn)
+			SonaGraphGui(this, thresh, bf, hStep, vStep).makeGui(thresh,  labStep:labStep, pitchOn:pitchOn)
 		}
 	}
 

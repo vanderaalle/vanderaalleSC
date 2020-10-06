@@ -30,6 +30,7 @@ Keyboarder {
 		map = map ? Array.series(58) ;
 		server = Server.local ;
 		server.waitForBoot({
+			/*
 			SynthDef(\keySquare, { arg freq, amp = 0.1, transp = 0, out = 0, width=0.5 ;
 				var dur ;
 				freq = freq.clip(0, 100.midicps) ;
@@ -55,23 +56,31 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 				,
 				LFNoise1.ar(0.1))
 				)
-			}).send(server) ;
+			}).add ;
 
-/*
+*/
 			SynthDef(\keySquare, { arg freq, amp = 0.1, transp = 0, out = 0, width=0.5 ;
 				Out.ar(out,
 				Pan2.ar(
 				EnvGen.kr(Env.perc, doneAction:2)
 				*Pulse.ar(freq, mul:amp, width:width)),
 				LFNoise1.ar(3))
-			}).send(server) ;
-*/
+			}).add ;
+			SynthDef(\mdaPiano, { |out=0, freq=440, gate=1,
+				vel = 100, decay  = 0.5, thresh = 0.01, mul = 0.1|
+				var son = MdaPiano.ar(freq, gate, vel, decay,
+					release: 0.5, stereo: 0.3, sustain: 0);
+				DetectSilence.ar(son, thresh, doneAction:2);
+				Out.ar(out, son * mul);
+			}).add ;
+
 		}) ;
 		doc = Document.new.title_(title)
-			.bounds_(bounds)
-			.background_(background)
-			.stringColor_(stringColor)
-			.font_(font)
+		// legacy from cocoa, doesn't work anymore
+			//.bounds_(bounds)
+			//.background_(background)
+			//.stringColor_(stringColor)
+			//.font_(font)
 			.keyDownAction_({arg doc, key, modifiers, keycode;
 				var width, pitch, amp = 0.9 ;
 				keycode.postln ;
@@ -146,7 +155,7 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 		log = log[1..] ;
 	}
 
-	playFromLog {
+	playFromLog {|defName = \keySquare, durMul = 1|
 		var key, time ;
 		var width, pitch, amp = 0.2 ;
 		var waitTime, actualTime, nextTime ;
@@ -162,9 +171,9 @@ Pulse.ar(freq, mul:amp*0.15, width:width)*LFNoise1.ar(20)*EnvGen.kr(Env.perc(rel
 
 				pitch = item[1] ;
 				width = 0.5/127*pitch.clip2(127) ;
-				Synth(\keySquare, [\freq, pitch.midicps, \amp, amp, \width, width]) ;
+				Synth(defName, [\freq, pitch.midicps, \amp, amp, \width, width]) ;
 
-				waitTime.wait ;
+				(waitTime*durMul).wait ;
 			})
 		}).play(AppClock) ;
 	}

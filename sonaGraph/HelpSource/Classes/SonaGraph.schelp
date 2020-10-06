@@ -82,11 +82,23 @@ Horizontal step. As there is no zoom feature, anRate x duration x hStep gives th
 ARGUMENT:: vStep
 Vertical step for each cell (height = vStep x 88).
 
+ARGUMENT:: labStep
+Step for labels.
+
+ARGUMENT:: thresh
+Amplitude threshold for displaying in dB.
+
+ARGUMENT:: pitchOn
+Whether to display pitch or not.
+
 METHOD:: postScript
 Allows to generate a PostScript file of the sonagram. It includes labelling. On y axis labels represent octave and Hz on opposite side.
 
 ARGUMENT:: path
 Path of the file, if extension is ps a PostScript file is generated, if pdf the method calls pstopdf from Terminal, creates a pdf, and remove the generated ps file. If pstopdf is not accessible, you can write ps and convert by hand.
+
+ARGUMENT:: buffer
+The buffer to be used for analysis. If nil the previously passed one is used.
 
 ARGUMENT:: width
 Width (+frame) in pixel of the PostScript file.
@@ -242,7 +254,6 @@ EXAMPLES::
 
 code::
 
-
 // here we start up server and defs
 SonaGraph.prepare ;
 
@@ -256,26 +267,26 @@ a = SonaGraph.new ;
 a.analyze(~sample,50) ; // high rate! 10 could be enough, depends on dur
 
 // writing to an archive, log extension is not necesssary
-a.writeArchive("/Users/andrea/Desktop/a11.log") ;
+a.writeArchive("/home/andrea/Desktop/a11.log") ;
 
 a.gui(hStep:5) ; // directly, if anRate=1 then default hStep 2.,5 fine
 
 // again
 a = SonaGraph.new ;
 // read the log, may requires some time
-a.readArchive("/Users/andrea/Desktop/a11.log") ;
+a.readArchive("/home/andrea/Desktop/a11.log") ;
 
 a.gui(~sample, 5) ; // now we need the pass the sample for playback
 // same as:
-g = SonaGraphGui(a, ~sample,5).makeGui ;
+g = SonaGraphGui(a, -96, ~sample,5).makeGui ;
 
 // resynthesis
 a.synthesize ; // start synthesis
 a.stopSynthesize ; // stop synthesis routine and free
 
 // postscript generation
-a.postScript("/Users/andrea/Desktop/a11.ps", ~sample, xEvery:0.25) ;
+a.postScript("/home/andrea/Desktop/a11.ps", ~sample, xEvery:0.25) ;
 // directly pdf
-a.postScript("/Users/andrea/Desktop/a11.pdf", ~sample, xEvery:0.25) ;
+a.postScript("/home/andrea/Desktop/a11.pdf", ~sample, xEvery:0.25) ;
 
 ::
