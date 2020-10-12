@@ -3,13 +3,15 @@
 // n bins of 88 values, where value is db and index pitch
 
 // here we use only class methods
-// data are constantly returned = ytou always get a spec
+// data are constantly returned = you always get a spec
 
 SD : SpectraDaw {} // just for shortcut
 
 SpectraDaw {
 
-	var <>spec ;
+	var <>spec ; //debrys?
+	classvar <>sigArr ;
+
 
 	// start with an array of amps
 	*from { arg sonaAmp, thresh = -96 ;
@@ -259,7 +261,7 @@ SpectraDaw {
 	}
 
 	// returns duration
-	dur {|spec, rate, asTimeString = false|
+	*dur {|spec, rate, asTimeString = false|
 		if (asTimeString){
 			^((spec)*rate.reciprocal).asTimeString
 		}{
@@ -371,7 +373,7 @@ a = SonaGraph.new ;
 a.analyze(~sample,15) ; // rate depends on dur etc
 
 // easy way to select
-g = SonaGraphGui.new(a, ~sample, hStep:5, vStep:6).makeGui(-40) ;
+g = SonaGraphGui.new(a, -96, ~sample, hStep:5, vStep:6).makeGui(-40) ;
 g.select(40, 55)
 
 
@@ -379,7 +381,6 @@ n = SpectraDaw.from(g.selected, -30)
 SD.check(n)
 //n.filterAbove
 SD.play(n, 4, 20)
-n.spec.size
 
 g.select(0, 40)
 m = SpectraDaw.from(g.selected, -30)
