@@ -43,7 +43,7 @@ SonaGraph {
 			}).add ;
 
 			SynthDef(\player, {|buf, start = 0, out = 0, amp = 1, dur |
-				Out.ar(out, PlayBuf.ar(1, buf, startPos:start)*amp
+				Out.ar(out, PlayBuf.ar(1, buf,BufRateScale.kr(buf), startPos:start)*amp
 					*Line.kr(1,1,dur, doneAction:2)
 				)
 			}).add ;
@@ -53,7 +53,7 @@ SonaGraph {
 				attD = 0.005, relD = 0.03|
 				var sus ;
 				sus = dur-attD-relD ;
-				Out.ar(out, PlayBuf.ar(1, buf, startPos:startFrame)*amp
+				Out.ar(out, PlayBuf.ar(1, buf,BufRateScale.kr(buf), startPos:startFrame)*amp
 					*EnvGen.kr(
 					Env.new([0,1,1,0], [attD, sus, relD], [-3,\linear,3]),
 						doneAction:2)
@@ -83,7 +83,7 @@ SonaGraph {
 		var x = Synth(\bank, [\freq, rate, \rq, rq]) ;
 		var y = Synth(\pitch, [\freq, rate]) ;
 		var anBus = Bus.audio(Server.local, 1) ;
-		var z = {Out.ar([anBus,0], PlayBuf.ar(1,buffer, doneAction:2))}.play ;
+		var z = {Out.ar([anBus,0], PlayBuf.ar(1,buffer, BufRateScale.kr(buffer), doneAction:2))}.play ;
 		amp = [] ; pitch = []; hasPitch = []; anRate = rate ;
 		buf = buffer ;
 		ampResp = OSCFunc({ |msg|  amp = amp.add(msg[3..]) }, '/amp');
