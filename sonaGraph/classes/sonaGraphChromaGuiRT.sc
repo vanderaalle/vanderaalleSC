@@ -13,12 +13,13 @@ SonaGraphChromaGuiRT {
 	var <>pos ; // actual position where to draw
 	var <>howManyBins ;
 	var updtRT, <>chroma ;
+	var <>synthVol ;
 
-	*new { arg sonaGraph, thresh = -96, hStep = 5, vStep = 20, howManyBins = 100  ;
-		^super.new.initSonaGraphGuiRT(sonaGraph, thresh, hStep, vStep, howManyBins)
+	*new { arg sonaGraph, thresh = -96, hStep = 5, vStep = 20, howManyBins = 100, synthVol = 0  ;
+		^super.new.initSonaGraphGuiRT(sonaGraph, thresh, hStep, vStep, howManyBins, synthVol)
 	}
 
-	initSonaGraphGuiRT { arg aSonaGraph, aThresh, aHStep, aVStep, aHowManyBins ;
+	initSonaGraphGuiRT { arg aSonaGraph, aThresh, aHStep, aVStep, aHowManyBins, aSynthVol ;
 		var act ;
 		sonaGraph = aSonaGraph ;
 		thresh = aThresh ;
@@ -31,6 +32,7 @@ SonaGraphChromaGuiRT {
 		anRate = sonaGraph.anRate ;
 		pos = 0 ;
 		howManyBins = aHowManyBins ;
+		synthVol = aSynthVol ;
 		act = \C;
 		updtRT = Routine{
 			inf.do{
@@ -44,7 +46,7 @@ SonaGraphChromaGuiRT {
 					ChordAnalyzer.convertName(chord).postln ;
 					if(chord.asSymbol != act.postln){
 					chord.do{|i|
-							Synth(\mdaPiano, [\freq, (i+60).midicps]) ;
+							Synth(\mdaPiano, [\freq, (i+60).midicps, \mul, synthVol.dbamp]) ;
 						} ;
 					act = chord.asSymbol
 					}

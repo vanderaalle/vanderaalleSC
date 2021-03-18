@@ -47,7 +47,7 @@ SpectraDawGui {
 		// if width is passed then it is used and the window will scroll if shorter
 		var ww = if (width.isNil){hStep*spec.size}{width} ;
 		w = if(window.isNil) {
-			Window("SonaGraph",
+			Window("SpectraDaw GUI",
 				Rect(10, 100, ww, vStep*spec[0].size+sfViewH+labView), scroll:true)
 			.background_(Color.gray)
 			.front } { window } ;
@@ -220,12 +220,12 @@ SpectraDawGui {
 		} ;
 		var r = {
 			(spec.size-from).do{
-				cp = (cp +1) ;
+				{cp = (cp +1)}.defer ;
 				u.refresh ;
 				rate.reciprocal.wait ;
 			};
-			u.close ;
-		}.fork(AppClock) ;
+			{u.close}.defer ;
+		}.fork ;
 		^[u, r]
 	}
 

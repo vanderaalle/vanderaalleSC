@@ -1,6 +1,6 @@
 C {
 	var <>symbol, <>root, <>name, <>structure, <>transp ;
-	classvar <>symbols ;
+	classvar <>symbols, <>intStruct ;
 	classvar <>decay, <>release ;
 
 	*initClass {
@@ -8,6 +8,7 @@ C {
 		decay = 0.5;
 		release = 0.5 ;
 		symbols = () ;
+		intStruct = () ;
 		t = "CM Cmaj	{0,4,7}
 Cm C- Cmin	{0,3,7}
 C+ Caug CM#5 CM+5	{0, 4, 8}
@@ -63,7 +64,11 @@ C7b11	{0, 4, 7, 10, 17}"
 			ch[0].do{|key|
 				symbols[key] = ch[1]
 			}
-		}
+		} ;
+		// interval structure notation
+		symbols.keys.do{|i|
+			intStruct[i] = symbols[i].differentiate
+		} ;
 
 	}
 

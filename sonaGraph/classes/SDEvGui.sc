@@ -38,7 +38,7 @@ SDEvGui {
 		maxExt = this.getMaxExt(evList) ;
 		selections = [] ; // an array of selection masks
 		sel = [0, 0] ;
-		dbVol = -20 ;
+		dbVol = -15 ;
 		actualSelection = this.newSelection ;
 		maxSels = aMaxSels ;
 		thisThread.randSeed = 1993;
@@ -100,7 +100,7 @@ SDEvGui {
 					} ;
 
 					if (actualSelection[i][j])
-					{col = Color.hsv(0,1,1);
+					{col = Color.hsv(0,1,1, 0.5);
 						strCol = Color.hsv(0,1,1)
 					} ;
 
@@ -390,12 +390,12 @@ SDEvGui {
 		} ;
 		var r = {
 			(maxExt-from).do{
-				cp = (cp +1) ;
-				u.refresh ;
+				cp = (cp + 1) ;
+				{u.refresh}.defer ;
 				rate.reciprocal.wait ;
 			};
-			u.close ;
-		}.fork(AppClock) ;
+			{u.close}.defer ;
+		}.fork ;
 		^[u, r]
 	}
 
